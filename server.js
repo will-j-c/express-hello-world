@@ -3,9 +3,12 @@ require('dotenv').config();
 
 const express = require('express');
 const mongoose = require('mongoose');
+const projectRouter = require('./routes/projectRoutes');
 
 const app = express();
 const port = process.env.PORT || 8800;
+
+app.use('/api/v1/projects', projectRouter);
 
 app.listen(port, async () => {
   try {
