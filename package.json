@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "db:seeds": "node ./seeds/users/users.js",
+    "db:seeds": "node ./seeds/seeds.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,6 +22,7 @@
     "bcrypt": "^5.0.1",
     "dotenv": "^16.0.2",
     "express": "^4.18.1",
+    "glob-all": "^3.3.0",
     "imagekit": "^4.1.1",
     "mongoose": "^6.5.4",
     "mongoose-slug-generator": "^1.0.4",
