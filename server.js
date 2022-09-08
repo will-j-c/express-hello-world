@@ -24,8 +24,10 @@ app.use('/api/v1/users', userRouter);
 
 app.listen(port, async () => {
   try {
-    await mongoose.connect(`mongodb://${process.env.MONGO_USER_NAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_DB_STRING}/?authMechanism=DEFAULT` || 'mongodb://localhost:27017',{dbName: 'hello-world'});
-  } catch(error) {
+    await mongoose.connect(process.env.MONGO_DB_STRING,
+      { dbName: 'hello-world' }
+    );
+  } catch (error) {
     console.log(`====>Failed to connect to DB<==== Error: ${error}`);
     process.exit(1);
   }
