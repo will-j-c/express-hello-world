@@ -12,6 +12,10 @@ const userRouter = require('./routes/userRoutes');
 const app = express();
 const port = process.env.PORT || 8800;
 
+
+app.use(express.urlencoded({extended: true}));
+app.use(express.json());
+
 app.use('/api/v1/projects', projectRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/roles', roleRouter);
