@@ -3,7 +3,7 @@
     "name": "Harold HideThePain",
     "username": "harold",
     "email": "harold@test.com",
-    "password": "harold123",
+    "hash": "harold123",
     "tagline": "permanently in pain",
     "profile_pic_url": "https://i.kym-cdn.com/entries/icons/mobile/000/016/546/hidethepainharold.jpg"
   },
@@ -12,7 +12,7 @@
     "name": "Steve MineCraft",
     "username": "steve",
     "email": "steve@test.com",
-    "password": "steve123",
+    "hash": "steve123",
     "socmed": [
       {
         "name": "github",
@@ -25,7 +25,7 @@
     "name": "Nuggets McSpicy",
     "username": "mcspicy",
     "email": "mcspicy@test.com",
-    "password": "mcspicy123",
+    "hash": "mcspicy123",
     "profile_pic_url": "https://live.staticflickr.com/1793/42886147132_aa26ab9979_n.jpg"
   },
 
@@ -33,14 +33,14 @@
     "name": "Zoe ZZZ",
     "username": "zoe",
     "email": "zoe@test.com",
-    "password": "zoe123"
+    "hash": "zoe123"
   },
 
   {
     "name": "Fluffy Llama",
     "username": "llama",
     "email": "llama@test.com",
-    "password": "llama123",
+    "hash": "llama123",
     "tagline": "bahhhhhhh"
   }
 ]
