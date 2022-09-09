@@ -5,6 +5,11 @@ const RoleSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  project_id: {
+    type: mongoose.ObjectId,
+    ref: 'Project',
+    required: true,
+  },
   skills: {
     type: Array,
     required: true,
