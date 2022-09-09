@@ -30,9 +30,6 @@ const projectSchema = new mongoose.Schema(
     state: {
       type: String,
     },
-    roles: {
-      type: Array,
-    },
     description: {
       type: String,
     },
