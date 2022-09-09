@@ -15,8 +15,6 @@ const ProjectSchema = Joi.object({
 
   state: Joi.string(),
 
-  roles: Joi.array().items(Joi.string()),
-
   description: Joi.string(),
 
   image_urls: Joi.array().items(Joi.string()),
