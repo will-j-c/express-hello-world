@@ -32,5 +32,6 @@ const controller = {
       });
     }
   },
+  showFollowingUsers: async (req, res) => {},
 };
 module.exports = controller;
