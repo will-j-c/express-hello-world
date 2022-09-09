@@ -6,14 +6,13 @@ const rolesRelationshipSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  project_id: {
+  role_id: {
     type: mongoose.ObjectId,
-    ref: 'Project',
+    ref: 'Role',
     required: true,
   },
   state: {
-    type: mongoose.ObjectId,
-    ref: 'Project',
+    type: String,
     required: true,
   },
 });
