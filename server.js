@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const projectRouter = require('./routes/projectRoutes');
 const authRouter = require('./routes/authRoutes');
 const commentRouter = require('./routes/commentRoutes');
-const roleRouter = require('./routes/roleRoutes');
+const contributorRouter = require('./routes/contributorRoutes');
 const userRouter = require('./routes/userRoutes');
 
 const app = express();
@@ -18,7 +18,7 @@ app.use(express.json());
 
 app.use('/api/v1/projects', projectRouter);
 app.use('/api/v1/auth', authRouter);
-app.use('/api/v1/roles', roleRouter);
+app.use('/api/v1/contributors', contributorRouter);
 app.use('/api/v1/comments', commentRouter);
 app.use('/api/v1/users', userRouter);
 
@@ -34,5 +34,3 @@ app.listen(port, async () => {
   console.log(`====>Connected to MongoDB`);
   console.log(`====>HelloWorld app listening on port ${port}<====`);
 });
-
-app.get('/', (req, res) => res.send('hello'));

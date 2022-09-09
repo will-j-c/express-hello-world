@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const RoleSchema = new mongoose.Schema({
+const ContributorSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -38,6 +38,6 @@ const RoleSchema = new mongoose.Schema({
   },
 });
 
-const RoleModel = mongoose.model('Role', RoleSchema);
+const ContributorModel = mongoose.model('Contributor', ContributorSchema);
 
-module.exports = RoleModel;
+module.exports = ContributorModel;

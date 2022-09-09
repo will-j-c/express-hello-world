@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 
-const rolesRelationshipSchema = new mongoose.Schema({
+const contributorRelationshipSchema = new mongoose.Schema({
   user_id: {
     type: mongoose.ObjectId,
     ref: 'User',
     required: true,
   },
-  role_id: {
+  contributor_id: {
     type: mongoose.ObjectId,
     ref: 'Role',
     required: true,
@@ -17,6 +17,9 @@ const rolesRelationshipSchema = new mongoose.Schema({
   },
 });
 
-const RolesRelationshipModel = mongoose.model('RolesRelationship', rolesRelationshipSchema);
+const ContributorRelationshipModel = mongoose.model(
+  'ContibutorRelationship',
+  contributorRelationshipSchema
+);
 
-module.exports = RolesRelationshipModel;
+module.exports = ContributorRelationshipModel;

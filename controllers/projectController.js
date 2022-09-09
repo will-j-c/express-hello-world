@@ -40,6 +40,22 @@ const controller = {
     }
     return res.status(201).json();
   },
+  projectShow: async (req, res) => {
+    let project = null;
+    try {
+      project = await ProjectModel.aggregate([
+        { $match: { slug: req.params.slug } },
+        // { $lookup: {from: ''} },
+      ]);
+    } catch (error) {
+      res.status(500);
+      return res.json({
+        error: 'Failed to fetch project from database',
+      });
+    }
+    res.status(200);
+    return res.json(project);
+  },
 };
 
 module.exports = controller;

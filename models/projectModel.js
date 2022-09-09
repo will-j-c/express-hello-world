@@ -6,7 +6,8 @@ mongoose.plugin(slug);
 const projectSchema = new mongoose.Schema(
   {
     user_id: {
-      type: String,
+      type: mongoose.ObjectId,
+      ref: 'User',
       required: true,
     },
     title: {

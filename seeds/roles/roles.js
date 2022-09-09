@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-param-reassign */
-const RoleModel = require('../../models/roleModel');
+const RoleModel = require('../../models/contributorModel');
 const ProjectModel = require('../../models/projectModel');
 
 const createRoles = async (roles) => {
