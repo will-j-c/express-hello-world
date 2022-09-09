@@ -1,12 +1,72 @@
 [
   {
-    "title": "Front-end Dev",
+    "title": "Frontend Developer",
     "project_id": "to be updated",
-    "skills": [],
+    "skills": [
+      "React",
+      "Frontend Development",
+      "JavaScript"
+    ],
     "is_remote": true,
     "description": "Making the website look fabulous",
-    "commitmendLevel": "Medium",
+    "commitmentLevel": "Medium",
     "remuneration": "$100/week",
     "available_slots": 1
+  },
+  {
+    "title": "Full Stack Developer",
+    "project_id": "to be updated",
+    "skills": [
+      "Full Stack",
+      "MERN"
+    ],
+    "is_remote": true,
+    "description": "Make magic happen - build everything by yourself from scratch",
+    "commitmentLevel": "High",
+    "available_slots": 2
+  },
+  {
+    "title": "Finance Wizard",
+    "project_id": "to be updated",
+    "skills": [
+      "Financial Planning",
+      "Project Management"
+    ],
+    "is_remote": false,
+    "city": "Singapore, Singapore",
+    "description": "Make the money move",
+    "commitmentLevel": "Low",
+    "available_slots": 1
+  },
+  {
+    "title": "Software Engineers",
+    "project_id": "to be updated",
+    "skills": [
+      "JavaScript",
+      "Full Stack",
+      "MERN",
+      "React Native",
+      "HTML/CSS",
+      "Python"
+    ],
+    "is_remote": true,
+    "city": "Ho Chi Minh, Vietnam",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    "commitmentLevel": "Medium",
+    "remuneration": "$250/week",
+    "available_slots": 3
+  },
+  {
+    "title": "UX/UI Designer",
+    "project_id": "to be updated",
+    "skills": [
+      "HTML/CSS",
+      "UI/UX Design",
+      "React"
+    ],
+    "is_remote": true,
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "commitmentLevel": "High",
+    "available_slots": 2
   }
 ]
