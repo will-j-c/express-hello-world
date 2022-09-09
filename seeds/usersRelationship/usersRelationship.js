@@ -5,20 +5,16 @@ const UserModel = require('../../models/userModel');
 const UsersRelationShipModel = require('../../models/usersRelationship');
 
 const createUsersRelationships = async (relations) => {
-  // get userIDs from DB to create projects
-  const firstUserID = await UserModel.findOne({ username: 'harold' }).exec();
-  const secondUserID = await UserModel.findOne({ username: 'steve' }).exec();
-  const thirdUserID = await UserModel.findOne({ username: 'mcspicy' }).exec();
-  const fourthUserID = await UserModel.findOne({ username: 'zoe' }).exec();
+  const users = await UserModel.find().exec();
 
-  relations[0].follower = firstUserID._id;
-  relations[0].followee = secondUserID._id;
-  relations[1].follower = secondUserID._id;
-  relations[1].followee = firstUserID._id;
-  relations[2].follower = firstUserID._id;
-  relations[2].followee = thirdUserID._id;
-  relations[3].follower = fourthUserID._id;
-  relations[3].followee = firstUserID._id;
+  relations[0].follower = users[0]._id;
+  relations[0].followee = users[1]._id;
+  relations[1].follower = users[1]._id;
+  relations[1].followee = users[0]._id;
+  relations[2].follower = users[0]._id;
+  relations[2].followee = users[2]._id;
+  relations[3].follower = users[3]._id;
+  relations[3].followee = users[0]._id;
 
   for await (const relation of relations) {
     try {
