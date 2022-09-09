@@ -16,12 +16,16 @@ const UsersRelations = require('./usersRelationship/usersRelationship.json');
 const projectsRelationshipsSeed = require('./projectsRelationship/projectsRelationship');
 const ProjectsRelations = require('./projectsRelationship/projectsRelationship.json');
 
+const rolesRelationshipsSeed = require('./rolesRelationship/rolesRelationship');
+const RolesRelations = require('./rolesRelationship/rolesRelationship.json');
+
 const seed = async () => {
   const usersSeeding = await userSeed(UsersJson);
   const projectsSeeding = await projectsSeed(ProjectsJson);
   const rolesSeeding = await rolesSeed(RolesJson);
   const usersRelationshipsSeeding = await usersRelationshipsSeed(UsersRelations);
   const projectsRelationshipsSeeding = await projectsRelationshipsSeed(ProjectsRelations);
+  const rolesRelationshipsSeeding = await rolesRelationshipsSeed(RolesRelations);
   process.exit(1);
 };
 
