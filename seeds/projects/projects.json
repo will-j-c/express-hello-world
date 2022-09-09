@@ -1,0 +1,47 @@
+[
+  {
+    "user_id": "to be updated",
+    "slug": "happy-robot",
+    "title": "Happy Robot",
+    "logo_url": "https://cdn-icons-png.flaticon.com/512/2021/2021646.png",
+    "tagline": "if you're happy and you know it...",
+    "state": "published",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+  },
+  {
+    "user_id": "to be updated",
+    "slug": "happy-meal",
+    "title": "Happy Meal",
+    "logo_url": "",
+    "state": "published",
+    "tagline": "if you're hungry and you know..."
+  },
+  {
+    "user_id": "to be updated",
+    "slug": "draft-project",
+    "title": "A draft Project",
+    "state": "draft"
+  },
+  {
+    "user_id": "to be updated",
+    "slug": "archived-project",
+    "title": "An Archived Project",
+    "state": "archived",
+    "tagline": "if you're hungry and you know..."
+  },
+  {
+    "user_id": "to be updated",
+    "slug": "filled-out-project",
+    "title": "Filled Out Project",
+    "logo_url": "https://cdn.pixabay.com/photo/2017/03/13/23/31/icon-2141485_960_720.png",
+    "tagline": "a tagline here",
+    "categories": ["Social Media", "MERN"],
+    "state": "published",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    "image_urls": [
+      "https://5.imimg.com/data5/LP/FA/MY-50363679/computer-world-500x500.jpg",
+      "https://www.kindpng.com/picc/m/217-2177240_computer-png-free-download-computer-images-for-project.png",
+      "https://www.rishikeshcity.com/wp-content/uploads/2019/11/11636831_13225561461_large.jpg"
+    ]
+  }
+]

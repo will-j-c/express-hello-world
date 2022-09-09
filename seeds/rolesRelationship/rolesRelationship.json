@@ -1,0 +1,32 @@
+[
+  {
+    "user_id": "to be updated",
+    "role_id": "to be updated",
+    "state": "applied"
+  },
+  {
+    "user_id": "to be updated",
+    "role_id": "to be updated",
+    "state": "applied"
+  },
+  {
+    "user_id": "to be updated",
+    "role_id": "to be updated",
+    "state": "applied"
+  },
+  {
+    "user_id": "to be updated",
+    "role_id": "to be updated",
+    "state": "accepted"
+  },
+  {
+    "user_id": "to be updated",
+    "role_id": "to be updated",
+    "state": "accepted"
+  },
+  {
+    "user_id": "to be updated",
+    "role_id": "to be updated",
+    "state": "rejected"
+  }
+]
