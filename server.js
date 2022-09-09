@@ -34,5 +34,3 @@ app.listen(port, async () => {
   console.log(`====>Connected to MongoDB`);
   console.log(`====>HelloWorld app listening on port ${port}<====`);
 });
-
-app.get('/', (req, res) => res.send('hello'));
