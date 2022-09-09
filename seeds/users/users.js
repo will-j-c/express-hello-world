@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 const bcrypt = require('bcrypt');
 
-const UsersJson = require('./users.json');
+// const UsersJson = require('./users.json');
 const UserModel = require('../../models/userModel');
 
 const createUsers = async (users) => {
@@ -17,4 +17,4 @@ const createUsers = async (users) => {
   }
 };
 
-module.exports = createUsers(UsersJson);
+module.exports = createUsers;
