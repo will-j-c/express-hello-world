@@ -1,28 +1,28 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-param-reassign */
-const RoleModel = require('../../models/contributorModel');
+const contributorModel = require('../../models/contributorModel');
 const ProjectModel = require('../../models/projectModel');
 
-const createRoles = async (roles) => {
+const createcontributors = async (contributors) => {
   // get projectIDs from DB
   const firstProjectID = await ProjectModel.findOne({ title: 'Happy Robot' }).exec();
   const secondProjectID = await ProjectModel.findOne({ title: 'Happy Meal' }).exec();
   const thirdProjectID = await ProjectModel.findOne({ title: 'An Archived Project' }).exec();
   const fourthProjectID = await ProjectModel.findOne({ title: 'Filled Out Project' }).exec();
 
-  roles[0].project_id = firstProjectID;
-  roles[1].project_id = secondProjectID;
-  roles[2].project_id = firstProjectID;
-  roles[3].project_id = thirdProjectID;
-  roles[4].project_id = fourthProjectID;
+  contributors[0].project_id = firstProjectID;
+  contributors[1].project_id = secondProjectID;
+  contributors[2].project_id = firstProjectID;
+  contributors[3].project_id = thirdProjectID;
+  contributors[4].project_id = fourthProjectID;
 
-  for await (const role of roles) {
+  for await (const contributor of contributors) {
     try {
-      await RoleModel.create(role);
+      await contributorModel.create(contributor);
     } catch (err) {
-      console.log(`err creating role: ${err}`);
+      console.log(`err creating contributor: ${err}`);
     }
   }
 };
 
-module.exports = createRoles;
+module.exports = createcontributors;

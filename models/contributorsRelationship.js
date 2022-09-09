@@ -8,7 +8,7 @@ const contributorRelationshipSchema = new mongoose.Schema({
   },
   contributor_id: {
     type: mongoose.ObjectId,
-    ref: 'Role',
+    ref: 'Contributor',
     required: true,
   },
   state: {
