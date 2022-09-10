@@ -48,11 +48,12 @@ const controller = {
           username,
           hash,
         },
-        process.env.JWT_SECRET_ACTIVATE
-      );
-    } catch (err) {
-      return res.status(500).json({ error: 'Failed to get user' });
-    }
+      },
+      process.env.JWT_SECRET_ACTIVATE
+    );
+    // } catch (err) {
+    //   return res.status(500).json({ error: 'Failed to get user' });
+    // }
 
     // TO DO: send email to user to activate the token
     // the activation url should be sth like
