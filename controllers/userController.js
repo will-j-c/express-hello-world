@@ -1,31 +1,35 @@
 const UserModel = require('../models/userModel');
+const ProjectModel = require('../models/projectModel');
 const UsersRelationshipModel = require('../models/usersRelationship');
-const UserValidationSchema = require('../validations/userValidation');
 
 const controller = {
   showAllUsers: async (req, res) => {
-    const users = [];
+    let users = [];
     try {
       users = await UserModel.aggregate([{ $match: {} }, { $sort: { updatedAt: -1 } }]);
+      console.log(users);
+      res.status(200);
+      return res.json(users);
     } catch (error) {
       res.status(500);
       return res.json({
         error: 'Failed to fetch users from database',
       });
     }
-    res.status(200);
-    return res.json(users);
   },
-  showUsername: async (req, res) => {
+  showProfile: async (req, res) => {
     const username = req.params.username;
     try {
-      const user = await UserModel.findOne({ username }).exec();
-      console.log(user);
-      if (!user) {
+      const profileOwner = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
+      if (!profileOwner) {
         return res.status(404).json();
       }
+      const projects = await await ProjectModel.findOne(
+        { user_id: profileOwner._id },
+        { __v: 0, _id: 0 }
+      ).lean();
       res.status(200);
-      return res.json(user);
+      return res.json({ profileOwner, projects });
     } catch (error) {
       res.status(500);
       return res.json({
