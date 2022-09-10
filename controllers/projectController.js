@@ -46,6 +46,9 @@ const controller = {
     }
     return res.status(201).json();
   },
+  deleteProject: async (req, res) => {
+    res.send('hello');
+  },
   projectShow: async (req, res) => {
     let project = null;
     let createdBy = null;
