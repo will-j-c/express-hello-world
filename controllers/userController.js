@@ -76,7 +76,12 @@ const controller = {
       });
     }
   },
-  addFollowUser: async (req, res) => {},
+  followUser: async (req, res) => {
+    const profileOwner = await UserModel.findOne(
+      { username: req.params.username },
+      { _id: 1 }
+    ).lean();
+  },
   unfollowUser: async (req, res) => {},
   deleteAccount: async (req, res) => {},
 };
