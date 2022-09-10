@@ -2,67 +2,78 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 const UserModel = require('../models/userModel');
-// const UserValidationSchema = require('../validations/userValidation');
+const UserValidator = require('../validations/userValidation');
 
 const controller = {
   register: async (req, res) => {
-    // TO DO: validation
-    const validatedValues = req.body;
+    let validatedResults = null;
+    try {
+      validatedResults = await UserValidator.register.validateAsync(req.body);
+    } catch (error) {
+      return res.status(400).json({
+        error: 'Invalid input',
+      });
+    }
 
     let user = null;
 
-    // check if email in used
-    try {
-      user = await UserModel.findOne({
-        email: validatedValues.email,
+    user = await UserModel.findOne({
+      email: validatedResults.email,
+    });
+    if (user) {
+      return res.status(409).json({
+        error: 'An account with this email already exists',
       });
-      if (user) {
-        return res.status(409).json({
-          error: 'An account with this email already exists',
-        });
-      }
+    }
 
-      user = await UserModel.findOne({
-        username: validatedValues.username,
+    user = await UserModel.findOne({
+      username: validatedResults.username,
+    });
+    if (user) {
+      return res.status(409).json({
+        error: 'Username is already in use',
       });
-      if (user) {
-        return res.status(409).json({
-          error: 'Username is already in use',
-        });
-      }
+    }
 
-      const hash = await bcrypt.hash(validatedResults.password, 10);
+    const hash = await bcrypt.hash(validatedResults.hash, 10);
+    const { email, username } = validatedResults;
 
-      // Generate token
-      const activateToken = jwt.sign(
-        {
-          // activateToken expiring in 15 minutes
-          exp: Math.floor(Date.now() / 1000) + 60 * 15,
-          data: {
-            email: validatedValues.email,
-            username: validatedValues.username,
-            hash,
-          },
+    // Generate activation token
+    const activateToken = jwt.sign(
+      {
+        // activateToken expiring in 15 minutes
+        exp: Math.floor(Date.now() / 1000) + 60 * 15,
+        data: {
+          email,
+          username,
+          hash,
         },
         process.env.JWT_SECRET_ACTIVATE
       );
-
     } catch (err) {
       return res.status(500).json({ error: 'Failed to get user' });
     }
 
-    return res.json();
+    // TO DO: send email to user to activate the token
+    // the activation url should be sth like
+    // clientURL/users/activate/${activateToken}
   },
 
   login: async (req, res) => {
-    // TO DO: validate input
+    let validatedResults = null;
+    try {
+      validatedResults = await UserValidator.login.validateAsync(req.body);
+    } catch (error) {
+      return res.status(400).json({
+        error: 'Invalid input',
+      });
+    }
 
-    const validatedValues = req.body;
     const errMsg = 'Incorrect username or password';
     let user = null;
 
     try {
-      user = await UserModel.findOne({ username: validatedValues.username });
+      user = await UserModel.findOne({ username: validatedResults.username });
       if (!user) {
         return res.status(401).json({ error: errMsg });
       }
@@ -70,7 +81,7 @@ const controller = {
       return res.status(500).json({ error: 'failed to get user' });
     }
 
-    const isPasswordCorrect = await bcrypt.compare(validatedValues.password, user.hash);
+    const isPasswordCorrect = await bcrypt.compare(validatedResults.hash, user.hash);
 
     if (!isPasswordCorrect) {
       return res.status(401).json({ error: errMsg });
