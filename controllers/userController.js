@@ -13,7 +13,7 @@ const controller = {
         { $project: { hash: 0 } },
       ]);
       console.log(users);
-      return res.status(200).json(users);
+      return res.json(users);
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch users from database',
@@ -32,7 +32,7 @@ const controller = {
         { user_id: profileOwner._id },
         { __v: 0, _id: 0 }
       ).lean();
-      return res.status(200).json({ profileOwner, projects });
+      return res.json({ profileOwner, projects });
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch user by username from database',
@@ -51,7 +51,7 @@ const controller = {
         { follower: user._id },
         { followee: 1 }
       ).populate({ path: 'followee', select: '-email -__v -hash' });
-      return res.status(200).json(followingUsers);
+      return res.json(followingUsers);
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch followingUsers from database',
@@ -70,7 +70,7 @@ const controller = {
         { followee: user._id },
         { follower: 1 }
       ).populate({ path: 'follower', select: '-email -__v -hash' });
-      return res.status(200).json(followerUsers);
+      return res.json(followerUsers);
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch followingUsers from database',
