@@ -6,18 +6,19 @@ const UserValidator = require('../validations/userValidation');
 
 const controller = {
   register: async (req, res) => {
-    const validatedResults = UserValidator.register.validate(req.body);
-    if (validatedResults.error) {
+    let validatedResults = null;
+    try {
+      validatedResults = await UserValidator.register.validateAsync(req.body);
+    } catch (error) {
       return res.status(400).json({
         error: 'Invalid input',
       });
     }
 
-    const validatedValues = validatedResults.value;
     let user = null;
 
     user = await UserModel.findOne({
-      email: validatedValues.email,
+      email: validatedResults.email,
     });
     if (user) {
       return res.status(409).json({
@@ -26,7 +27,7 @@ const controller = {
     }
 
     user = await UserModel.findOne({
-      username: validatedValues.username,
+      username: validatedResults.username,
     });
     if (user) {
       return res.status(409).json({
@@ -34,8 +35,8 @@ const controller = {
       });
     }
 
-    const hash = await bcrypt.hash(validatedValues.hash, 10);
-    const { email, username } = validatedValues;
+    const hash = await bcrypt.hash(validatedResults.hash, 10);
+    const { email, username } = validatedResults;
 
     // Generate activation token
     const activateToken = jwt.sign(
@@ -59,8 +60,10 @@ const controller = {
   },
 
   login: async (req, res) => {
-    const validatedResults = UserValidator.login.validate(req.body);
-    if (validatedResults.error) {
+    let validatedResults = null;
+    try {
+      validatedResults = await UserValidator.login.validateAsync(req.body);
+    } catch (error) {
       return res.status(400).json({
         error: 'Invalid input',
       });
@@ -68,10 +71,9 @@ const controller = {
 
     const errMsg = 'Incorrect username or password';
     let user = null;
-    const validatedValues = validatedResults.value;
 
     try {
-      user = await UserModel.findOne({ username: validatedValues.username });
+      user = await UserModel.findOne({ username: validatedResults.username });
       if (!user) {
         return res.status(401).json({ error: errMsg });
       }
@@ -79,7 +81,7 @@ const controller = {
       return res.status(500).json({ error: 'failed to get user' });
     }
 
-    const isPasswordCorrect = await bcrypt.compare(validatedValues.hash, user.hash);
+    const isPasswordCorrect = await bcrypt.compare(validatedResults.hash, user.hash);
 
     if (!isPasswordCorrect) {
       return res.status(401).json({ error: errMsg });
