@@ -81,7 +81,19 @@ const controller = {
         { username: 1, profile_pic_url: 1, _id: 0 }
       ).lean();
       // Get comments TODO consolidate user details into comments
-      comments = await CommentModel.find({ project_id: project.user_id }).lean();
+      comments = await CommentModel.find(
+        { project_id: project._id },
+        { _id: 0, project_id: 0, __v: 0 }
+      ).lean();
+      for (let i = 0, len = comments.length; i < len; i += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        const user = await UserModel.findOne(
+          { _id: comments[i].user_id },
+          { username: 1, profile_pic_url: 1, _id: 0 }
+        ).lean();
+        comments[i].createdBy = user;
+        delete comments[i].user_id;
+      }
       // Get jobs
       jobs = await ContributorModel.find(
         { project_id: project._id },
