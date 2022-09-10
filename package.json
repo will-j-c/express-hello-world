@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/will-j-c/express-hello-world#readme",
   "dependencies": {
+    "@sendgrid/mail": "^7.7.0",
     "bcrypt": "^5.0.1",
     "dotenv": "^16.0.2",
     "express": "^4.18.1",

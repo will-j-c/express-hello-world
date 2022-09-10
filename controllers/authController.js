@@ -1,5 +1,8 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const sgMail = require('@sendgrid/mail');
+
+sgMail.setApiKey(process.env.SENDGRID_APIKEY);
 
 const UserModel = require('../models/userModel');
 const UserValidator = require('../validations/userValidation');
@@ -52,11 +55,32 @@ const controller = {
       process.env.JWT_SECRET_ACTIVATE
     );
 
-    return res.json({ activateToken });
+    const message = {
+      to: email,
+      from: 'helloworld.sg.ga@gmail.com',
+      subject: 'Please Verify Your Email',
+      // TO DO: change the verification url to client side url instead
+      html: `
+        <h1>Welcome to HelloWorld!</h1>
+        <hr/>
+        <h2>Let's verify your email</h2>
+        <p>https://localhost:${process.env.PORT || 8800}/api/v1/users/${activateToken}/activate</p>
+        <a href="https://localhost:${
+          process.env.PORT || 8800
+        }/api/v1/users/${activateToken}/activate"
+          <button>Verify</button>
+        </a>
+      `,
+    };
 
-    // TO DO: send email to user to activate the token
-    // the activation url should be sth like
-    // clientURL/users/activate/${activateToken}
+    try {
+      await sgMail.send(message);
+      return res.json({ activateToken });
+    } catch (error) {
+      return res.status(500).json({
+        error: 'Unable to send activation email',
+      });
+    }
   },
 
   login: async (req, res) => {
