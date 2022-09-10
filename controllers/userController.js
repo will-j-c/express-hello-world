@@ -27,7 +27,7 @@ const controller = {
       if (!profileOwner) {
         return res.status(404).json();
       }
-      const projects = await await ProjectModel.findOne(
+      const projects = await ProjectModel.findOne(
         { user_id: profileOwner._id },
         { __v: 0, _id: 0 }
       ).lean();
@@ -81,6 +81,7 @@ const controller = {
       { username: req.params.username },
       { _id: 1 }
     ).lean();
+    console.log(profileOwner);
   },
   unfollowUser: async (req, res) => {},
   deleteAccount: async (req, res) => {},
