@@ -6,6 +6,7 @@ const ContributorModel = require('../models/contributorModel');
 const ContributorRelationshipsModel = require('../models/contributorsRelationship');
 const ProjectsRelationshipModel = require('../models/projectsRelationship');
 const ProjectValidationSchema = require('../validations/projectValidation');
+const { findOne } = require('../models/projectModel');
 
 const controller = {
   showAllProjects: async (req, res) => {
@@ -121,6 +122,27 @@ const controller = {
       res.status(500);
       return res.json({
         error: 'Failed to follow project',
+      });
+    }
+  },
+  unfollowProject: async (req, res) => {
+    try {
+      const user = await UserModel.findOne({ username: req.params.username }, { _id: 1 }).lean();
+      const project = await ProjectModel.findOne({ slug: req.params.slug }, { _id: 1 }).lean();
+      // Check if user has already followed project and create relationship if not
+      const response = await ProjectsRelationshipModel.deleteOne({
+        user_id: user._id,
+        project_id: project._id,
+      });
+      if (response.deletedCount) {
+        return res.status(205).json();
+      }
+      return res.status(204).json();
+    } catch (error) {
+      console.log(error);
+      res.status(500);
+      return res.json({
+        error: 'Failed to unfollow project',
       });
     }
   },
