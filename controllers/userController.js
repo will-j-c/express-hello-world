@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const UserModel = require('../models/userModel');
 const ProjectModel = require('../models/projectModel');
 const UsersRelationshipModel = require('../models/usersRelationship');
@@ -77,7 +78,34 @@ const controller = {
     }
   },
   addFollowUser: async (req, res) => {},
-  unfollowUser: async (req, res) => {},
+  unfollowUser: async (req, res) => {
+    try {
+      const token = req.header('Authorization').slice(7);
+      const verified = jwt.verify(token, process.env.JWT_SECRET_ACCESS);
+      const followee = await UserModel.findOne(
+        { username: req.params.username },
+        { _id: 1 }
+      ).lean();
+      const follower = await UserModel.findOne(
+        { username: verified.data.username },
+        { _id: 1 }
+      ).lean();
+
+      const response = await UsersRelationshipModel.findOneAndDelete({
+        follower: follower._id,
+        followee: followee._id,
+      });
+      if (response?.deletedCount) {
+        return res.status(205).json();
+      }
+      return res.status(204).json();
+    } catch (error) {
+      console.log(error.message);
+      return res.status(500).json({
+        error: 'Failed to unfollow User',
+      });
+    }
+  },
   deleteAccount: async (req, res) => {},
 };
 module.exports = controller;
