@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const ProjectModel = require('../models/projectModel');
 const UserModel = require('../models/userModel');
 const CommentModel = require('../models/commentModel');
@@ -51,7 +52,7 @@ const controller = {
     let comments = null;
     let jobs = null;
     try {
-      project = await ProjectModel.findOne({ slug: req.params.slug }).lean();
+      project = await ProjectModel.findOne({ slug: req.params.slug }, { __v: 0 }).lean();
       // Get creator
       createdBy = await UserModel.findOne(
         { _id: project.user_id },
@@ -61,26 +62,34 @@ const controller = {
       comments = await CommentModel.find({ project_id: project.user_id }).lean();
       // Get jobs
       // eslint-disable-next-line no-underscore-dangle
-      jobs = await ContributorModel.find({ project_id: project._id }, { project_id: 0 }).lean();
+      jobs = await ContributorModel.find(
+        { project_id: project._id },
+        { project_id: 0, __v: 0 }
+      ).lean();
       // Get users for jobs
       for (let i = 0, len = jobs.length; i < len; i += 1) {
         // eslint-disable-next-line no-await-in-loop
         jobs[i].contributors = await ContributorRelationships.find(
           // eslint-disable-next-line no-underscore-dangle
           { contributor_id: jobs[i]._id },
-          { _id: 0, contributor_id: 0 }
+          { _id: 0, contributor_id: 0, __v: 0 }
         );
-        for (let j = 0, length = jobs[i].contributors.length; j < len; j += 1) {
+        // Get the user details for each contributor and append to the jobs contributors
+        for (let j = 0, { length } = jobs[i].contributors; j < length; j += 1) {
           // eslint-disable-next-line no-await-in-loop
           const user = await UserModel.findOne(
             { _id: jobs[i].contributors[j].user_id },
             { username: 1, profile_pic_url: 1, _id: 0 }
-          );
-          console.log(user);
+          ).lean();
+          if (user) {
+            jobs[i].contributors[j] = { user, state: jobs[i].contributors[j].state };
+          }
         }
+        delete jobs[i]._id;
       }
-      // Get the user details for each contributor
-      console.log(jobs.contributors);
+      // Clean up data that does not need to be sent
+      delete project._id;
+      delete project.user_id;
     } catch (error) {
       console.log(error);
       res.status(500);
