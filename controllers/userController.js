@@ -1,9 +1,10 @@
 const UserModel = require('../models/userModel');
+const UsersRelationshipModel = require('../models/usersRelationship');
 const UserValidationSchema = require('../validations/userValidation');
 
 const controller = {
   showAllUsers: async (req, res) => {
-    let users = [];
+    const users = [];
     try {
       users = await UserModel.aggregate([{ $match: {} }, { $sort: { updatedAt: -1 } }]);
     } catch (error) {
@@ -32,6 +33,28 @@ const controller = {
       });
     }
   },
-  showFollowingUsers: async (req, res) => {},
+  showFollowingUsers: async (req, res) => {
+    const username = req.params;
+    const user = await UserModel.findOne({ username }).exec();
+    console.log(user);
+    // const followingUsers = [];
+    // try {
+    //   followingUsers = await UsersRelationshipModel.aggregate([
+    //     { $match: { follower: username } },
+    //     { $sort: { updatedAt: -1 } },
+    //   ]);
+    //   res.status(200);
+    //   return res.json(followingUsers);
+    // } catch (error) {
+    //   res.status(500);
+    //   return res.json({
+    //     error: 'Failed to fetch followingUsers from database',
+    //   });
+    // }
+  },
+  showFollowerUsers: async (req, res) => {},
+  addFollowUser: async (req, res) => {},
+  unfollowUser: async (req, res) => {},
+  deleteAccount: async (req, res) => {},
 };
 module.exports = controller;
