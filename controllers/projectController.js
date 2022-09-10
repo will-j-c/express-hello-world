@@ -68,6 +68,34 @@ const controller = {
       });
     }
   },
+  deleteProject: async (req, res) => {
+    try {
+      // Find the project to delete so that you can use the _id, if the project doesn't exist return 404 Not Found
+      const projectToDelete = await ProjectModel.findOne({ slug: req.params.slug }, { _id: 1 });
+      if (!projectToDelete) {
+        return res.status(404).json();
+      }
+      // Delete the roles and the relationships
+      const rolesToDelete = await ContributorModel.find(
+        { project_id: projectToDelete._id },
+        { _id: 1 }
+      );
+      await ContributorRelationshipsModel.deleteMany({ contributor_id: { $in: rolesToDelete } });
+      await ContributorModel.deleteMany({ project_id: projectToDelete._id });
+      // Delete project references in comments
+      await CommentModel.deleteMany({ project_id: projectToDelete._id });
+      // Delete project references in project relationships
+      await ProjectsRelationshipModel.deleteMany({ project_id: projectToDelete._id });
+      // Delete project in projects
+      projectToDelete.deleteOne();
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: 'Failed to delete project',
+      });
+    }
+    return res.status(200).json();
+  },
   projectShow: async (req, res) => {
     let project = null;
     let createdBy = null;
@@ -81,7 +109,19 @@ const controller = {
         { username: 1, profile_pic_url: 1, _id: 0 }
       ).lean();
       // Get comments TODO consolidate user details into comments
-      comments = await CommentModel.find({ project_id: project.user_id }).lean();
+      comments = await CommentModel.find(
+        { project_id: project._id },
+        { _id: 0, project_id: 0, __v: 0 }
+      ).lean();
+      for (let i = 0, len = comments.length; i < len; i += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        const user = await UserModel.findOne(
+          { _id: comments[i].user_id },
+          { username: 1, profile_pic_url: 1, _id: 0 }
+        ).lean();
+        comments[i].createdBy = user;
+        delete comments[i].user_id;
+      }
       // Get jobs
       jobs = await ContributorModel.find(
         { project_id: project._id },

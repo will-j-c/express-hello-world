@@ -81,6 +81,7 @@ const controller = {
       });
     }
   },
+
   addFollowUser: async (req, res) => {},
 
   unfollowUser: async (req, res) => {},

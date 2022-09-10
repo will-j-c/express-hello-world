@@ -7,6 +7,7 @@ router.post('/:slug/follow/:username', projectController.followProject);
 router.delete('/:slug/unfollow/:username', projectController.unfollowProject);
 router.get('/:slug', projectController.projectShow);
 router.put('/:slug', projectController.editProject);
+router.delete('/:slug', projectController.deleteProject);
 router.get('/', projectController.showAllProjects);
 router.post('/', projectController.createProject);
 
