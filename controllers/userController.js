@@ -101,8 +101,7 @@ const controller = {
       return res.status(204).json();
     } catch (error) {
       console.log(error.message);
-      res.status(500);
-      return res.json({
+      return res.status(500).json({
         error: 'Failed to follow User',
       });
     }
