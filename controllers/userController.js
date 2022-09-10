@@ -15,8 +15,7 @@ const controller = {
       res.status(200);
       return res.json(users);
     } catch (error) {
-      res.status(500);
-      return res.json({
+      return res.status(500).json({
         error: 'Failed to fetch users from database',
       });
     }
@@ -36,8 +35,7 @@ const controller = {
       res.status(200);
       return res.json({ profileOwner, projects });
     } catch (error) {
-      res.status(500);
-      return res.json({
+      return res.status(500).json({
         error: 'Failed to fetch user by username from database',
       });
     }
