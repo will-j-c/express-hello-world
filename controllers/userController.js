@@ -17,6 +17,7 @@ const controller = {
       });
     }
   },
+  //TODO: Considering about AuthUser , who is not profileOwner
   showProfile: async (req, res) => {
     const username = req.params.username;
     try {
