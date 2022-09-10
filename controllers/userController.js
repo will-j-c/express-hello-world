@@ -6,7 +6,11 @@ const controller = {
   showAllUsers: async (req, res) => {
     let users = [];
     try {
-      users = await UserModel.aggregate([{ $match: {} }, { $sort: { updatedAt: -1 } }]);
+      users = await UserModel.aggregate([
+        { $match: {} },
+        { $sort: { updatedAt: -1 } },
+        { $project: { hash: 0 } },
+      ]);
       console.log(users);
       res.status(200);
       return res.json(users);
