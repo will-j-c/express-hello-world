@@ -3,8 +3,8 @@ const ProjectModel = require('../models/projectModel');
 const UserModel = require('../models/userModel');
 const CommentModel = require('../models/commentModel');
 const ContributorModel = require('../models/contributorModel');
-const ContributorRelationships = require('../models/contributorsRelationship');
-
+const ContributorRelationshipsModel = require('../models/contributorsRelationship');
+const ProjectsRelationshipModel = require('../models/projectsRelationship');
 const ProjectValidationSchema = require('../validations/projectValidation');
 
 const controller = {
@@ -69,7 +69,7 @@ const controller = {
       // Get users for jobs
       for (let i = 0, len = jobs.length; i < len; i += 1) {
         // eslint-disable-next-line no-await-in-loop
-        jobs[i].contributors = await ContributorRelationships.find(
+        jobs[i].contributors = await ContributorRelationshipsModel.find(
           // eslint-disable-next-line no-underscore-dangle
           { contributor_id: jobs[i]._id },
           { _id: 0, contributor_id: 0, __v: 0 }
@@ -101,7 +101,26 @@ const controller = {
     return res.json({ project, createdBy, comments, jobs });
   },
   followProject: async (req, res) => {
-    res.send('hello');
+    try {
+      const user = await UserModel.findOne({ username: req.params.username }, { _id: 1 }).lean();
+      const project = await ProjectModel.findOne({ slug: req.params.slug }, { _id: 1 }).lean();
+      // Check if user has already followed project and create relationship if not
+      const userAlreadyFollowing = await ProjectsRelationshipModel.findOne(
+        { user_id: user._id, project_id: project._id },
+        { _id: 1 }
+      ).lean();
+      if (!userAlreadyFollowing) {
+        await ProjectsRelationshipModel.create({ user_id: user._id, project_id: project._id });
+        return res.status(201).json();
+      }
+      return res.status(204).json();
+    } catch (error) {
+      console.log(error);
+      res.status(500);
+      return res.json({
+        error: 'Failed to follow project',
+      });
+    }
   },
 };
 
