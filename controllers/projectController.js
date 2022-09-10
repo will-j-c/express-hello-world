@@ -6,7 +6,6 @@ const ContributorModel = require('../models/contributorModel');
 const ContributorRelationshipsModel = require('../models/contributorsRelationship');
 const ProjectsRelationshipModel = require('../models/projectsRelationship');
 const ProjectValidationSchema = require('../validations/projectValidation');
-const { findOne } = require('../models/projectModel');
 
 const controller = {
   showAllProjects: async (req, res) => {
@@ -18,8 +17,7 @@ const controller = {
         { $sort: { updatedAt: -1 } },
       ]);
     } catch (error) {
-      res.status(500);
-      return res.json({
+      return res.status(500).json({
         error: 'Failed to fetch projects from database',
       });
     }
@@ -108,12 +106,13 @@ const controller = {
       const user = await UserModel.findOne({ username: req.params.username }, { _id: 1 }).lean();
       const project = await ProjectModel.findOne({ slug: req.params.slug }, { _id: 1 }).lean();
       // Check if user has already followed project and create relationship if not
-      const userAlreadyFollowing = await ProjectsRelationshipModel.findOne(
+      const updatedRelationship = await ProjectsRelationshipModel.findOneAndUpdate(
         { user_id: user._id, project_id: project._id },
-        { _id: 1 }
-      ).lean();
-      if (!userAlreadyFollowing) {
-        await ProjectsRelationshipModel.create({ user_id: user._id, project_id: project._id });
+        {},
+        { upsert: true, new: true }
+      );
+      console.log(updatedRelationship);
+      if (updatedRelationship) {
         return res.status(201).json();
       }
       return res.status(204).json();
