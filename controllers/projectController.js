@@ -11,7 +11,11 @@ const controller = {
   showAllProjects: async (req, res) => {
     let projects = [];
     try {
-      projects = await ProjectModel.aggregate([{ $match: {} }, { $sort: { updatedAt: -1 } }]);
+      projects = await ProjectModel.aggregate([
+        { $match: {} },
+        { $project: { _id: 0, user_id: 0, description: 0 } },
+        { $sort: { updatedAt: -1 } },
+      ]);
     } catch (error) {
       res.status(500);
       return res.json({
@@ -61,7 +65,6 @@ const controller = {
       // Get comments TODO consolidate user details into comments
       comments = await CommentModel.find({ project_id: project.user_id }).lean();
       // Get jobs
-      // eslint-disable-next-line no-underscore-dangle
       jobs = await ContributorModel.find(
         { project_id: project._id },
         { project_id: 0, __v: 0 }
@@ -70,7 +73,6 @@ const controller = {
       for (let i = 0, len = jobs.length; i < len; i += 1) {
         // eslint-disable-next-line no-await-in-loop
         jobs[i].contributors = await ContributorRelationshipsModel.find(
-          // eslint-disable-next-line no-underscore-dangle
           { contributor_id: jobs[i]._id },
           { _id: 0, contributor_id: 0, __v: 0 }
         );
