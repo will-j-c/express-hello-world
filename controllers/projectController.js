@@ -3,18 +3,21 @@ const ProjectModel = require('../models/projectModel');
 const UserModel = require('../models/userModel');
 const CommentModel = require('../models/commentModel');
 const ContributorModel = require('../models/contributorModel');
-const ContributorRelationships = require('../models/contributorsRelationship');
-
+const ContributorRelationshipsModel = require('../models/contributorsRelationship');
+const ProjectsRelationshipModel = require('../models/projectsRelationship');
 const ProjectValidationSchema = require('../validations/projectValidation');
 
 const controller = {
   showAllProjects: async (req, res) => {
     let projects = [];
     try {
-      projects = await ProjectModel.aggregate([{ $match: {} }, { $sort: { updatedAt: -1 } }]);
+      projects = await ProjectModel.aggregate([
+        { $match: {} },
+        { $project: { _id: 0, user_id: 0, description: 0 } },
+        { $sort: { updatedAt: -1 } },
+      ]);
     } catch (error) {
-      res.status(500);
-      return res.json({
+      return res.status(500).json({
         error: 'Failed to fetch projects from database',
       });
     }
@@ -61,7 +64,6 @@ const controller = {
       // Get comments TODO consolidate user details into comments
       comments = await CommentModel.find({ project_id: project.user_id }).lean();
       // Get jobs
-      // eslint-disable-next-line no-underscore-dangle
       jobs = await ContributorModel.find(
         { project_id: project._id },
         { project_id: 0, __v: 0 }
@@ -69,8 +71,7 @@ const controller = {
       // Get users for jobs
       for (let i = 0, len = jobs.length; i < len; i += 1) {
         // eslint-disable-next-line no-await-in-loop
-        jobs[i].contributors = await ContributorRelationships.find(
-          // eslint-disable-next-line no-underscore-dangle
+        jobs[i].contributors = await ContributorRelationshipsModel.find(
           { contributor_id: jobs[i]._id },
           { _id: 0, contributor_id: 0, __v: 0 }
         );
@@ -101,7 +102,48 @@ const controller = {
     return res.json({ project, createdBy, comments, jobs });
   },
   followProject: async (req, res) => {
-    res.send('hello');
+    try {
+      const user = await UserModel.findOne({ username: req.params.username }, { _id: 1 }).lean();
+      const project = await ProjectModel.findOne({ slug: req.params.slug }, { _id: 1 }).lean();
+      // Check if user has already followed project and create relationship if not
+      const updatedRelationship = await ProjectsRelationshipModel.findOneAndUpdate(
+        { user_id: user._id, project_id: project._id },
+        {},
+        { upsert: true, new: true }
+      );
+      console.log(updatedRelationship);
+      if (updatedRelationship) {
+        return res.status(201).json();
+      }
+      return res.status(204).json();
+    } catch (error) {
+      console.log(error);
+      res.status(500);
+      return res.json({
+        error: 'Failed to follow project',
+      });
+    }
+  },
+  unfollowProject: async (req, res) => {
+    try {
+      const user = await UserModel.findOne({ username: req.params.username }, { _id: 1 }).lean();
+      const project = await ProjectModel.findOne({ slug: req.params.slug }, { _id: 1 }).lean();
+      // Check if user has already followed project and create relationship if not
+      const response = await ProjectsRelationshipModel.deleteOne({
+        user_id: user._id,
+        project_id: project._id,
+      });
+      if (response.deletedCount) {
+        return res.status(205).json();
+      }
+      return res.status(204).json();
+    } catch (error) {
+      console.log(error);
+      res.status(500);
+      return res.json({
+        error: 'Failed to unfollow project',
+      });
+    }
   },
 };
 
