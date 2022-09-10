@@ -29,11 +29,9 @@ const controller = {
     let validatedResults = null;
     try {
       validatedResults = await ProjectValidationSchema.validateAsync(req.body);
-      console.log(validatedResults);
     } catch (error) {
       console.log(error);
-      res.status(400);
-      return res.json({
+      return res.status(400).json({
         error: 'Validation failed',
       });
     }
@@ -42,12 +40,33 @@ const controller = {
       await ProjectModel.create(validatedResults);
     } catch (error) {
       console.log(error);
-      res.status(500);
-      return res.json({
+      return res.status(500).json({
         error: 'Failed to create project',
       });
     }
     return res.status(201).json();
+  },
+  editProject: async (req, res) => {
+    // Validations
+    let validatedResults = null;
+    try {
+      validatedResults = await ProjectValidationSchema.validateAsync(req.body);
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        error: 'Validation failed',
+      });
+    }
+    // Find and update the document
+    try {
+      await ProjectModel.findOneAndUpdate({ slug: req.params.slug }, validatedResults);
+      return res.status(201).json();
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: 'Failed to edit project',
+      });
+    }
   },
   projectShow: async (req, res) => {
     let project = null;
