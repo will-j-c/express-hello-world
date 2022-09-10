@@ -12,8 +12,7 @@ const controller = {
         { $project: { hash: 0 } },
       ]);
       console.log(users);
-      res.status(200);
-      return res.json(users);
+      return res.status(200).json(users);
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch users from database',
@@ -32,8 +31,7 @@ const controller = {
         { user_id: profileOwner._id },
         { __v: 0, _id: 0 }
       ).lean();
-      res.status(200);
-      return res.json({ profileOwner, projects });
+      return res.status(200).json({ profileOwner, projects });
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch user by username from database',
@@ -41,23 +39,22 @@ const controller = {
     }
   },
   showFollowingUsers: async (req, res) => {
-    const username = req.params;
-    const user = await UserModel.findOne({ username }).exec();
-    console.log(user);
-    // const followingUsers = [];
-    // try {
-    //   followingUsers = await UsersRelationshipModel.aggregate([
-    //     { $match: { follower: username } },
-    //     { $sort: { updatedAt: -1 } },
-    //   ]);
-    //   res.status(200);
-    //   return res.json(followingUsers);
-    // } catch (error) {
-    //   res.status(500);
-    //   return res.json({
-    //     error: 'Failed to fetch followingUsers from database',
-    //   });
-    // }
+    const username = req.params.username;
+    const user = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
+    const userId = user._id;
+    let followingUsers = null;
+    try {
+      followingUsers = await UsersRelationshipModel.find(
+        { follower: userId },
+        { followee: 1 }
+      ).populate({ path: 'followee', select: '-email -__v -hash' });
+      return res.status(200).json(followingUsers);
+    } catch (error) {
+      res.status(500);
+      return res.json({
+        error: 'Failed to fetch followingUsers from database',
+      });
+    }
   },
   showFollowerUsers: async (req, res) => {},
   addFollowUser: async (req, res) => {},
