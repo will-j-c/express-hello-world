@@ -76,7 +76,11 @@ const controller = {
       });
     }
   },
-  addFollowUser: async (req, res) => {},
+  addFollowUser: async (req, res) => {
+    const followee = await UserModel.findOne({ username: req.params.username }, { _id: 1 }).lean();
+    console.log(req.header);
+    // const profileOwner = jwt.verify(req.headers.user, process.env.JWT_SECRET);
+  },
   unfollowUser: async (req, res) => {},
   deleteAccount: async (req, res) => {},
 };
