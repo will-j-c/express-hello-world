@@ -41,22 +41,41 @@ const controller = {
   showFollowingUsers: async (req, res) => {
     const username = req.params.username;
     const user = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
-    const userId = user._id;
+    if (!user) {
+      return res.status(404).json();
+    }
     let followingUsers = null;
     try {
       followingUsers = await UsersRelationshipModel.find(
-        { follower: userId },
+        { follower: user._id },
         { followee: 1 }
       ).populate({ path: 'followee', select: '-email -__v -hash' });
       return res.status(200).json(followingUsers);
     } catch (error) {
-      res.status(500);
-      return res.json({
+      return res.status(500).json({
         error: 'Failed to fetch followingUsers from database',
       });
     }
   },
-  showFollowerUsers: async (req, res) => {},
+  showFollowerUsers: async (req, res) => {
+    const username = req.params.username;
+    const user = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
+    if (!user) {
+      return res.status(404).json();
+    }
+    let followerUsers = null;
+    try {
+      followerUsers = await UsersRelationshipModel.find(
+        { followee: user._id },
+        { follower: 1 }
+      ).populate({ path: 'follower', select: '-email -__v -hash' });
+      return res.status(200).json(followerUsers);
+    } catch (error) {
+      return res.status(500).json({
+        error: 'Failed to fetch followingUsers from database',
+      });
+    }
+  },
   addFollowUser: async (req, res) => {},
   unfollowUser: async (req, res) => {},
   deleteAccount: async (req, res) => {},
