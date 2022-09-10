@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+
 const UserModel = require('../models/userModel');
 const ProjectModel = require('../models/projectModel');
 const UsersRelationshipModel = require('../models/usersRelationship');
@@ -19,6 +21,7 @@ const controller = {
       });
     }
   },
+
   //TODO: Considering about AuthUser , who is not profileOwner
   showProfile: async (req, res) => {
     const username = req.params.username;
@@ -38,6 +41,7 @@ const controller = {
       });
     }
   },
+
   showFollowingUsers: async (req, res) => {
     const username = req.params.username;
     const user = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
@@ -57,6 +61,7 @@ const controller = {
       });
     }
   },
+
   showFollowerUsers: async (req, res) => {
     const username = req.params.username;
     const user = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
@@ -77,7 +82,29 @@ const controller = {
     }
   },
   addFollowUser: async (req, res) => {},
+
   unfollowUser: async (req, res) => {},
+
   deleteAccount: async (req, res) => {},
+
+  activateAccount: async (req, res) => {
+    const { token } = req.params;
+    const verified = jwt.verify(token, process.env.JWT_SECRET_ACTIVATE);
+
+    if (!verified) {
+      return res.status(401).json({
+        error: 'Activation link expired',
+      });
+    }
+
+    try {
+      const user = await UserModel.create(verified.data);
+      return res.json({ user });
+    } catch (error) {
+      return res.status(401).json({
+        error: 'Failed to activate user account',
+      });
+    }
+  },
 };
 module.exports = controller;

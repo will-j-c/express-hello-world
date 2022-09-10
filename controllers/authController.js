@@ -39,7 +39,7 @@ const controller = {
     }
 
     const hash = await bcrypt.hash(validatedResults.hash, 10);
-    const { email, username } = validatedResults;
+    const { email, username, name } = validatedResults;
 
     // Generate activation token
     const activateToken = jwt.sign(
@@ -48,6 +48,7 @@ const controller = {
         exp: Math.floor(Date.now() / 1000) + 60 * 15,
         data: {
           email,
+          name,
           username,
           hash,
         },
