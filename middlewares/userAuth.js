@@ -2,21 +2,21 @@ const jwt = require('jsonwebtoken');
 
 const userAuth = {
   isAuthenticated: (req, res, next) => {
-    const authzHeader = req.header('Authorization');
-    if (!authzHeader) {
+    const authHeader = req.header('Authorisation');
+    if (!authHeader) {
       return res.status(401).json({
-        message: 'Authentication details empty',
+        error: 'Authentication details empty',
       });
     }
-    if (authzHeader.slice(0, 7) !== 'Bearer ') {
+    if (authHeader.slice(0, 7) !== 'Bearer ') {
       return res.status(401).json({
-        message: 'Invalid authentication type',
+        error: 'Invalid authentication type',
       });
     }
-    const token = authzHeader.slice(7);
+    const token = authHeader.slice(7);
     if (token.length === 0) {
       return res.status(401).json({
-        message: 'Invalid authentication token',
+        error: 'Invalid authentication token',
       });
     }
 
@@ -24,9 +24,7 @@ const userAuth = {
 
     if (verified) {
       res.locals.userAuth = verified;
-      next();
-      // eslint-disable-next-line consistent-return
-      return;
+      return next();
     }
 
     return res.status(401).json({

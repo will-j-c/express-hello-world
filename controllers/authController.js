@@ -9,16 +9,46 @@ const controller = {
     // TO DO: validation
     const validatedValues = req.body;
 
+    let user = null;
+
     // check if email in used
     try {
-      const user = await UserModel.findOne({
+      user = await UserModel.findOne({
         email: validatedValues.email,
       });
       if (user) {
-        return res.status(409).json({ error: 'email in used' });
+        return res.status(409).json({
+          error: 'An account with this email already exists',
+        });
       }
+
+      user = await UserModel.findOne({
+        username: validatedValues.username,
+      });
+      if (user) {
+        return res.status(409).json({
+          error: 'Username is already in use',
+        });
+      }
+
+      const hash = await bcrypt.hash(validatedResults.password, 10);
+
+      // Generate token
+      const activateToken = jwt.sign(
+        {
+          // activateToken expiring in 15 minutes
+          exp: Math.floor(Date.now() / 1000) + 60 * 15,
+          data: {
+            email: validatedValues.email,
+            username: validatedValues.username,
+            hash,
+          },
+        },
+        process.env.JWT_SECRET_ACTIVATE
+      );
+
     } catch (err) {
-      return res.status(500).json({ error: 'failed to get user' });
+      return res.status(500).json({ error: 'Failed to get user' });
     }
 
     return res.json();
@@ -37,7 +67,7 @@ const controller = {
         return res.status(401).json({ error: errMsg });
       }
     } catch (err) {
-      return res.status(500).json({ err: 'failed to get user' });
+      return res.status(500).json({ error: 'failed to get user' });
     }
 
     const isPasswordCorrect = await bcrypt.compare(validatedValues.password, user.hash);
