@@ -4,6 +4,7 @@ const projectController = require('../controllers/projectController');
 const router = express.Router();
 
 router.get('/:slug', projectController.projectShow);
+router.put('/:slug', projectController.editProject);
 router.get('/', projectController.showAllProjects);
 router.post('/', projectController.createProject);
 
