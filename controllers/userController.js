@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const UserModel = require('../models/userModel');
 const ProjectModel = require('../models/projectModel');
 const UsersRelationshipModel = require('../models/usersRelationship');
@@ -76,10 +77,35 @@ const controller = {
       });
     }
   },
-  addFollowUser: async (req, res) => {
-    const followee = await UserModel.findOne({ username: req.params.username }, { _id: 1 }).lean();
-    console.log(req.header);
-    // const profileOwner = jwt.verify(req.headers.user, process.env.JWT_SECRET);
+  followUser: async (req, res) => {
+    try {
+      const token = req.header('Authorization').slice(7);
+      const verified = jwt.verify(token, process.env.JWT_SECRET_ACCESS);
+      const followee = await UserModel.findOne(
+        { username: req.params.username },
+        { _id: 1 }
+      ).lean();
+      const follower = await UserModel.findOne(
+        { username: verified.data.username },
+        { _id: 1 }
+      ).lean();
+
+      const updatedRelationship = await UsersRelationshipModel.findOneAndUpdate(
+        { follower: follower._id, followee: followee._id },
+        {},
+        { upsert: true, new: true }
+      );
+      if (updatedRelationship) {
+        return res.status(201).json();
+      }
+      return res.status(204).json();
+    } catch (error) {
+      console.log(error.message);
+      res.status(500);
+      return res.json({
+        error: 'Failed to follow User',
+      });
+    }
   },
   unfollowUser: async (req, res) => {},
   deleteAccount: async (req, res) => {},
