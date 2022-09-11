@@ -164,7 +164,16 @@ const controller = {
   },
 
   delete: async (req, res) => {
-
+    try {
+      await ContributorModel.deleteOne({ _id: req.contributorID });
+      return res.json({
+        message: `Successfully removed contributor ${req.contributorID}`,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        error: 'Failed to delete contributor',
+      });
+    }
   },
 
   addApplicant: async (req, res) => {
