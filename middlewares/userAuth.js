@@ -1,5 +1,4 @@
 /* eslint-disable no-underscore-dangle */
-const { isError } = require('joi');
 const jwt = require('jsonwebtoken');
 const CommentModel = require('../models/commentModel');
 const UserModel = require('../models/userModel');
@@ -38,10 +37,10 @@ const userAuth = {
 
   isAuthorized: async (req, res, next) => {
     const commentRoute = '/api/v1/comments';
+    const comment = await CommentModel.findOne({ _id: req.params.id }, { user_id: 1, _id: 0 });
+    const user = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
     if (req.baseUrl === commentRoute) {
       // Compare the comment user_id to the user making the request
-      const comment = await CommentModel.findOne({ _id: req.params.id }, { user_id: 1, _id: 0 });
-      const user = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
       if (comment.user_id.toString() === user._id.toString()) {
         return next();
       }
