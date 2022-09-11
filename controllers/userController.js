@@ -140,6 +140,7 @@ const controller = {
     const verified = jwt.verify(token, process.env.JWT_SECRET_ACTIVATE);
 
     if (!verified) {
+      console.log(error);
       return res.status(401).json({
         error: 'Activation link expired',
       });
