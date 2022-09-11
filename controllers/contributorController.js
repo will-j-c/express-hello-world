@@ -11,7 +11,8 @@ const validSkills = require('../seeds/predefined-data/skills.json');
 const getData = async (req) => {
   const user = await UserModel.findOne({ username: req.authUser.username });
   const project = await ProjectModel.findOne({ slug: req.body.project_slug });
-  return [user, project];
+  const isProjectOwner = project.user_id.toString() === user._id.toString();
+  return [user, project, isProjectOwner];
 };
 
 const controller = {
@@ -82,7 +83,6 @@ const controller = {
 
   add: async (req, res) => {
     const {
-      // project_slug,
       title,
       skills,
       is_remote,
@@ -110,12 +110,10 @@ const controller = {
     }
 
     try {
-      const [user, project] = await getData(req);
-      // const user = await UserModel.findOne({ username: req.authUser.username });
-      // const project = await ProjectModel.findOne({ slug: project_slug });
+      const [user, project, isProjectOwner] = await getData(req);
 
       // authorisation check: whether user is the project owner
-      if (project.user_id.toString() !== user._id.toString()) {
+      if (!isProjectOwner) {
         return res.status(401).json({
           error: 'User is not authorised to change this project',
         });
