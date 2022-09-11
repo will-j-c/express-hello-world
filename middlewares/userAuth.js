@@ -2,6 +2,8 @@
 const jwt = require('jsonwebtoken');
 const CommentModel = require('../models/commentModel');
 const UserModel = require('../models/userModel');
+const ContributorModel = require('../models/contributorModel');
+const ProjectModel = require('../models/projectModel');
 
 const userAuth = {
   isAuthenticated: (req, res, next) => {
@@ -36,17 +38,47 @@ const userAuth = {
   },
 
   isAuthorized: async (req, res, next) => {
-    const commentRoute = '/api/v1/comments';
-    const comment = await CommentModel.findOne({ _id: req.params.id }, { user_id: 1, _id: 0 });
+    const route = req.baseUrl.split('/').pop();
+
     const user = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
-    if (req.baseUrl === commentRoute) {
-      // Compare the comment user_id to the user making the request
+
+    switch (route) {
+      case 'comments':
+        commentsAuth();
+        break;
+      case 'contributors':
+        contributorsAuth();
+        break;
+      default:
+        return next();
+    }
+
+    async function commentsAuth() {
+      const comment = await CommentModel.findOne({ _id: req.params.id }, { user_id: 1, _id: 0 });
       if (comment.user_id.toString() === user._id.toString()) {
         return next();
       }
       return res.status(403).json();
     }
-    return next();
+
+    async function contributorsAuth() {
+      let projectFilter = null;
+      const contributor = await ContributorModel.findOne({ _id: req.params.id });
+      if (req.body.project_slug) {
+        projectFilter = { slug: req.body.project_slug };
+      } else if (contributor) {
+        projectFilter = { _id: contributor.project_id };
+      }
+      const project = await ProjectModel.findOne(projectFilter);
+      if (project.user_id.toString() === user._id.toString()) {
+        req.contributorID = contributor?._id;
+        req.projectID = project._id;
+        return next();
+      }
+      return res.status(403).json({
+        error: 'User is not authorized to change Contributor details for this project',
+      });
+    }
   },
 };
 

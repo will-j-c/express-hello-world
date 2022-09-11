@@ -8,32 +8,6 @@ const UserModel = require('../models/userModel');
 const validator = require('../validations/contributorValidation');
 const validSkills = require('../seeds/predefined-data/skills.json');
 
-const getData = async (req) => {
-  const user = await UserModel.findOne({ username: req.authUser.username });
-  console.log(`userid is ${user._id}`);
-  let projectFilter = null;
-  let isProjectOwner = null;
-  const contributor = await ContributorModel.findOne({ _id: req.params.id });
-
-  let relations = null;
-  if (contributor) {
-    relations = await RelationshipModel.find({ contributor_id: contributor._id });
-  }
-
-  if (req.body.project_slug) {
-    projectFilter = { slug: req.body.project_slug };
-  } else if (contributor) {
-    projectFilter = { _id: contributor.project_id };
-  }
-
-  const project = await ProjectModel.findOne(projectFilter);
-  isProjectOwner = project.user_id.toString() === user._id.toString();
-
-  // TO DO: once authorization middleware is ready, can remove this
-  // const isProjectOwner = project.user_id.toString() === user._id.toString();
-  return [user, project, contributor, isProjectOwner, relations];
-};
-
 const controller = {
   showAll: async (req, res) => {
     // not sure but may need to apply filters based on req.query in future
@@ -113,24 +87,15 @@ const controller = {
     }
 
     try {
-      const [, project, , isProjectOwner] = await getData(req);
-
-      // authorisation check: whether user is the project owner
-      if (!isProjectOwner) {
-        return res.status(401).json({
-          error: 'User is not authorised to change this project',
-        });
-      }
-
       const { skills, title } = data;
 
       // check if there exists a contributor with the same name in database
-      const existingContributor = await ContributorModel.find({
-        project_id: project._id,
+      const existingContributor = await ContributorModel.findOne({
+        project_id: req.projectID,
         title,
       });
 
-      if (existingContributor.length > 0) {
+      if (existingContributor) {
         return res.status(409).json({
           error: 'There is existing contributor with the same title',
         });
@@ -142,7 +107,7 @@ const controller = {
         .filter((item) => validSkills.includes(item));
 
       data.skills = skillsArr;
-      data.project_id = project._id;
+      data.project_id = req.projectID;
 
       const newContributor = await ContributorModel.create(data);
 
@@ -166,14 +131,7 @@ const controller = {
       });
     }
 
-    const [, , contributor, isProjectOwner, relations] = await getData(req);
-
-    // authorisation check: whether user is the project owner
-    if (!isProjectOwner) {
-      return res.status(401).json({
-        error: 'User is not authorised to change this project',
-      });
-    }
+    const relations = await RelationshipModel.find({ contributor_id: req.contributorID });
 
     const skillsArr = data.skills
       .split(',')
@@ -192,7 +150,7 @@ const controller = {
     // Find and update the document
     try {
       const updatedContributor = await ContributorModel.findOneAndUpdate(
-        { _id: contributor._id },
+        { _id: req.contributorID },
         data,
         { new: true }
       );

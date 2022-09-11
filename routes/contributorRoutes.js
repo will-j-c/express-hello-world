@@ -11,8 +11,8 @@ router.post('/:id/apply', authMiddleware.isAuthenticated, controller.addApplican
 router.delete('/:id/withdraw', authMiddleware.isAuthenticated, controller.removeApplicant);
 router.get('/:id', controller.showOne);
 router.delete('/:id', authMiddleware.isAuthenticated, controller.delete);
-router.put('/:id', authMiddleware.isAuthenticated, controller.update);
+router.put('/:id', authMiddleware.isAuthenticated, authMiddleware.isAuthorized, controller.update);
 router.get('/', controller.showAll);
-router.post('/', authMiddleware.isAuthenticated, controller.add);
+router.post('/', authMiddleware.isAuthenticated, authMiddleware.isAuthorized, controller.add);
 
 module.exports = router;
