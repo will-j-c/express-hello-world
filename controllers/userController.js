@@ -46,10 +46,15 @@ const controller = {
         { $project: { __v: 0, user_id: 0 } },
       ]);
       // show ContributedProject with status : accecpted
-      const contributedJobs = await ContributorRelationshipModel.find({
-        user_id: profileOwner._id,
-        // state: 'accepted',
-      }).populate('contributor_id', 'user_id');
+      const contributedJobs = await ContributorRelationshipModel.find(
+        {
+          user_id: profileOwner._id,
+          state: 'accepted',
+        },
+        { contributor_id: 1 }
+      )
+        .populate('contributor_id')
+        .populate('project_id');
       let contributedProjects = [];
 
       return res.json({ profileOwner, hostedProjects, hostedPublicProjects, contributedJobs });
