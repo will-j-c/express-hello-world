@@ -25,7 +25,7 @@ const contributorSchema = new mongoose.Schema({
   city: {
     type: String,
   },
-  commitmentLevel: {
+  commitment_level: {
     type: String,
     required: true,
   },
