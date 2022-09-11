@@ -1,6 +1,11 @@
+/* eslint-disable no-underscore-dangle */
 const ContributorModel = require('../models/contributorModel');
 const ProjectModel = require('../models/projectModel');
 const RelationshipModel = require('../models/contributorsRelationship');
+const UserModel = require('../models/userModel');
+
+const validator = require('../validations/contributorValidation');
+const validSkills = require('../seeds/predefined-data/skills.json');
 
 const controller = {
   showAll: async (req, res) => {
@@ -69,6 +74,80 @@ const controller = {
   },
 
   add: async (req, res) => {
+    const { 
+      project_slug,
+      title,
+      skills,
+      is_remote,
+      description,
+      commitmentLevel,
+      available_slots,
+      remuneration,
+      city
+    } = req.body;
+
+    try {
+      await validator.add.validateAsync({
+        title,
+        skills,
+        is_remote,
+        description,
+        commitmentLevel,
+        available_slots
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        error: 'Invalid input',
+      });
+    }
+
+    try {
+      const user = await UserModel.findOne({ username: req.authUser.username });
+      const project = await ProjectModel.findOne({ slug: project_slug });
+
+      // authorisation check: whether user is the project owner
+      if (project.user_id.toString() !== user._id.toString()) {
+        return res.status(401).json({
+          error: 'User is not authorised to change this project',
+        });
+      }
+
+      // check if there exists a contributor with the same name in database
+      const existingContributor = await ContributorModel.find({
+        project_id: project._id,
+        title,
+      });
+
+      if (existingContributor.length > 0) {
+        return res.status(409).json({
+          error: 'There is existing contributor with the same title',
+        });
+      }
+
+      const skillsArr = skills
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => validSkills.includes(item));
+
+      const newContributor = await ContributorModel.create({
+        title,
+        project_id: project._id,
+        skills: skillsArr,
+        is_remote,
+        description,
+        commitmentLevel,
+        available_slots,
+        city,
+        remuneration,
+      });
+
+      return res.status(201).json(newContributor);
+    } catch (error) {
+      return res.status(500).json({
+        error: 'Failed to fetch data',
+      });
+    }
 
   },
 
