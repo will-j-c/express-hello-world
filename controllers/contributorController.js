@@ -245,7 +245,18 @@ const controller = {
   },
 
   rejectApplicant: async (req, res) => {
-
+    try {
+      const [, , relation] = await getData(req);
+      await relation.updateOne({ state: 'rejected' });
+      return res.json({
+        message: `Updated relationship ${relation._id} state to rejected`,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: 'Failed to update contributor status',
+      });
+    }
   },
 }
 
