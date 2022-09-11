@@ -15,12 +15,12 @@ const userValidation = {
     hash: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).min(6).required(),
   }),
   profile: Joi.object({
-    name: Joi.string().min(3).max(30).required(),
+    name: Joi.string().min(3).max(30),
     skills: Joi.array().items(Joi.string()),
     interests: Joi.array().items(Joi.string()),
     socmed: Joi.array().items(Joi.string()),
-    tagline: Joi.string().required(),
-    profile_pic_url: Joi.string().required(),
+    tagline: Joi.string(),
+    profile_pic_url: Joi.string(),
   }),
 };
 
