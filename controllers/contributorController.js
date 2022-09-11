@@ -14,12 +14,13 @@ const getData = async (req) => {
     user = await UserModel.findOne({ username: req.params.username });
   }
   const contributor = await ContributorModel.findOne({ _id: req.params.id });
+  const project = await ProjectModel.findOne({ _id: contributor.project_id });
   const relation = await RelationshipModel.findOne({ 
     user_id: user._id,
     contributor_id: contributor._id,
   });
 
-  return [user?._id, contributor?._id, relation]
+  return [user?._id, contributor?._id, project?.user_id, relation];
 };
 
 const controller = {
@@ -193,22 +194,30 @@ const controller = {
 
   addApplicant: async (req, res) => {
     try {
-      const [user_id, contributor_id,] = await getData(req);
+      const [user_id, contributor_id, projectOwner_id, relation] = await getData(req);
 
-      const relation = await RelationshipModel.findOneAndUpdate(
-        {
-          user_id,
-          contributor_id,
-        },
-        { state: 'applied' },
-        {
-          new: true,
-          upsert: true,
-        }
-      );
+      if (relation) {
+        return res.status(409).json({
+          error: 'User has already applied previously',
+        })
+      }
 
-      return res.json(relation);
+      console.log(`user_id is ${user_id}`);
+      console.log(`projectOwner_id is ${projectOwner_id}`);
+      if (user_id.toString() === projectOwner_id.toString()) {
+        return res.status(409).json({
+          error: 'Project owner cannot apply to be a contributor',
+        })
+      }
+      const newRelation = await RelationshipModel.create({
+        user_id,
+        contributor_id,
+        state: 'applied'
+      });
+      return res.json(newRelation);
+
     } catch (error) {
+      console.log(error);
       return res.status(500).json({
         error: 'Failed to apply',
       });
@@ -217,7 +226,7 @@ const controller = {
 
   removeApplicant: async (req, res) => {
     try {
-      const [, , relation] = await getData(req);
+      const [, , , relation] = await getData(req);
       await relation.deleteOne();
       return res.json({
         message: `successfully delete ${relation._id}`,
