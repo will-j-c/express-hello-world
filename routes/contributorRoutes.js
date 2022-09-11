@@ -10,7 +10,12 @@ router.put('/:id/reject/:userId', authMiddleware.isAuthenticated, controller.rej
 router.post('/:id/apply', authMiddleware.isAuthenticated, controller.addApplicant);
 router.delete('/:id/withdraw', authMiddleware.isAuthenticated, controller.removeApplicant);
 router.get('/:id', controller.showOne);
-router.delete('/:id', authMiddleware.isAuthenticated, controller.delete);
+router.delete(
+  '/:id',
+  authMiddleware.isAuthenticated,
+  authMiddleware.isAuthorized,
+  controller.delete
+);
 router.put('/:id', authMiddleware.isAuthenticated, authMiddleware.isAuthorized, controller.update);
 router.get('/', controller.showAll);
 router.post('/', authMiddleware.isAuthenticated, authMiddleware.isAuthorized, controller.add);
