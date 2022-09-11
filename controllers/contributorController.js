@@ -4,6 +4,8 @@ const ProjectModel = require('../models/projectModel');
 const RelationshipModel = require('../models/contributorsRelationship');
 const UserModel = require('../models/userModel');
 
+const validator = require('../validations/contributorValidation');
+
 const controller = {
   showAll: async (req, res) => {
     // not sure but may need to apply filters based on req.query in future
@@ -73,6 +75,24 @@ const controller = {
   add: async (req, res) => {
     // TO DO: add validator
     const { project_slug, title, skills, is_remote, description, commitmentLevel, available_slots } = req.body;
+    let validatedResults = null;
+
+    try {
+      validatedResults = await validator.add.validateAsync({
+        title,
+        skills,
+        is_remote,
+        description,
+        commitmentLevel,
+        available_slots
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        error: 'Invalid input',
+      });
+    }
+
     try {
       const user = await UserModel.findOne({ username: req.authUser.username });
       const project = await ProjectModel.findOne({ slug: project_slug });
