@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-underscore-dangle */
 const ContributorModel = require('../models/contributorModel');
 const ProjectModel = require('../models/projectModel');
@@ -6,6 +7,12 @@ const UserModel = require('../models/userModel');
 
 const validator = require('../validations/contributorValidation');
 const validSkills = require('../seeds/predefined-data/skills.json');
+
+const getData = async (req) => {
+  const user = await UserModel.findOne({ username: req.authUser.username });
+  const project = await ProjectModel.findOne({ slug: req.body.project_slug });
+  return [user, project];
+};
 
 const controller = {
   showAll: async (req, res) => {
@@ -74,8 +81,8 @@ const controller = {
   },
 
   add: async (req, res) => {
-    const { 
-      project_slug,
+    const {
+      // project_slug,
       title,
       skills,
       is_remote,
@@ -103,8 +110,9 @@ const controller = {
     }
 
     try {
-      const user = await UserModel.findOne({ username: req.authUser.username });
-      const project = await ProjectModel.findOne({ slug: project_slug });
+      const [user, project] = await getData(req);
+      // const user = await UserModel.findOne({ username: req.authUser.username });
+      // const project = await ProjectModel.findOne({ slug: project_slug });
 
       // authorisation check: whether user is the project owner
       if (project.user_id.toString() !== user._id.toString()) {
