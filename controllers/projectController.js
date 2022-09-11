@@ -5,7 +5,7 @@ const CommentModel = require('../models/commentModel');
 const ContributorModel = require('../models/contributorModel');
 const ContributorRelationshipsModel = require('../models/contributorsRelationship');
 const ProjectsRelationshipModel = require('../models/projectsRelationship');
-const ProjectValidationSchema = require('../validations/projectValidation');
+const projectValidationSchema = require('../validations/projectValidation');
 
 const controller = {
   showAllProjects: async (req, res) => {
@@ -28,7 +28,7 @@ const controller = {
     // Validations
     let validatedResults = null;
     try {
-      validatedResults = await ProjectValidationSchema.validateAsync(req.body);
+      validatedResults = await projectValidationSchema.create.validateAsync(req.body);
     } catch (error) {
       console.log(error);
       return res.status(400).json({
@@ -50,7 +50,7 @@ const controller = {
     // Validations
     let validatedResults = null;
     try {
-      validatedResults = await ProjectValidationSchema.validateAsync(req.body);
+      validatedResults = await projectValidationSchema.edit.validateAsync(req.body);
     } catch (error) {
       console.log(error);
       return res.status(400).json({
