@@ -166,6 +166,7 @@ const controller = {
   delete: async (req, res) => {
     try {
       await ContributorModel.deleteOne({ _id: req.contributorID });
+      await RelationshipModel.deleteMany({ contributor_id: req.contributorID });
       return res.json({
         message: `Successfully removed contributor ${req.contributorID}`,
       });
