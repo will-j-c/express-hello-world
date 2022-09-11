@@ -1,14 +1,34 @@
 const express = require('express');
 const projectController = require('../controllers/projectController');
+const authMiddleware = require('../middlewares/userAuth');
 
 const router = express.Router();
 
-router.post('/:slug/follow/:username', projectController.followProject);
-router.delete('/:slug/unfollow/:username', projectController.unfollowProject);
+router.post(
+  '/:slug/follow/:username',
+  authMiddleware.isAuthenticated,
+  projectController.followProject
+);
+router.delete(
+  '/:slug/unfollow/:username',
+  authMiddleware.isAuthenticated,
+  authMiddleware.isAuthorized,
+  projectController.unfollowProject
+);
 router.get('/:slug', projectController.projectShow);
-router.put('/:slug', projectController.editProject);
-router.delete('/:slug', projectController.deleteProject);
+router.put(
+  '/:slug',
+  authMiddleware.isAuthenticated,
+  authMiddleware.isAuthorized,
+  projectController.editProject
+);
+router.delete(
+  '/:slug',
+  authMiddleware.isAuthenticated,
+  authMiddleware.isAuthorized,
+  projectController.deleteProject
+);
 router.get('/', projectController.showAllProjects);
-router.post('/', projectController.createProject);
+router.post('/', authMiddleware.isAuthenticated, projectController.createProject);
 
 module.exports = router;
