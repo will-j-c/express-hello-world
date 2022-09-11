@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-underscore-dangle */
 const ContributorModel = require('../models/contributorModel');
 const ProjectModel = require('../models/projectModel');
@@ -74,27 +75,10 @@ const controller = {
   },
 
   add: async (req, res) => {
-    const { 
-      project_slug,
-      title,
-      skills,
-      is_remote,
-      description,
-      commitment_level,
-      available_slots,
-      remuneration,
-      city
-    } = req.body;
-
+    const data = { ...req.body };
+    delete data.project_slug;
     try {
-      await validator.add.validateAsync({
-        title,
-        skills,
-        is_remote,
-        description,
-        commitment_level,
-        available_slots
-      });
+      await validator.details.validateAsync(data);
     } catch (error) {
       console.log(error);
       return res.status(400).json({
@@ -103,23 +87,15 @@ const controller = {
     }
 
     try {
-      const user = await UserModel.findOne({ username: req.authUser.username });
-      const project = await ProjectModel.findOne({ slug: project_slug });
-
-      // authorisation check: whether user is the project owner
-      if (project.user_id.toString() !== user._id.toString()) {
-        return res.status(401).json({
-          error: 'User is not authorised to change this project',
-        });
-      }
+      const { skills, title } = data;
 
       // check if there exists a contributor with the same name in database
-      const existingContributor = await ContributorModel.find({
-        project_id: project._id,
+      const existingContributor = await ContributorModel.findOne({
+        project_id: req.projectID,
         title,
       });
 
-      if (existingContributor.length > 0) {
+      if (existingContributor) {
         return res.status(409).json({
           error: 'There is existing contributor with the same title',
         });
@@ -130,33 +106,75 @@ const controller = {
         .map((item) => item.trim())
         .filter((item) => validSkills.includes(item));
 
-      const newContributor = await ContributorModel.create({
-        title,
-        project_id: project._id,
-        skills: skillsArr,
-        is_remote,
-        description,
-        commitment_level,
-        available_slots,
-        city,
-        remuneration,
-      });
+      data.skills = skillsArr;
+      data.project_id = req.projectID;
+
+      const newContributor = await ContributorModel.create(data);
 
       return res.status(201).json(newContributor);
     } catch (error) {
+      console.log(`error: ${error}`);
       return res.status(500).json({
         error: 'Failed to fetch data',
       });
     }
-
   },
 
   update: async (req, res) => {
+    let data = null;
+    try {
+      data = await validator.details.validateAsync(req.body);
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        error: 'Invalid input',
+      });
+    }
 
+    const relations = await RelationshipModel.find({ contributor_id: req.contributorID });
+
+    const skillsArr = data.skills
+      .split(',')
+      .map((item) => item.trim())
+      .filter((item) => validSkills.includes(item));
+    data.skills = skillsArr;
+
+    // cannot change available slots below the # of accepted users
+    const acceptedRelations = relations.filter((relation) => relation.state === 'accepted');
+    if (data.available_slots < acceptedRelations.length) {
+      return res.status(400).json({
+        error: 'Invalid input',
+      });
+    }
+
+    // Find and update the document
+    try {
+      const updatedContributor = await ContributorModel.findOneAndUpdate(
+        { _id: req.contributorID },
+        data,
+        { new: true }
+      );
+      return res.status(200).json(updatedContributor);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: 'Failed to edit contributor',
+      });
+    }
   },
 
   delete: async (req, res) => {
-
+    try {
+      await ContributorModel.deleteOne({ _id: req.contributorID });
+      await RelationshipModel.deleteMany({ contributor_id: req.contributorID });
+      return res.json({
+        message: `Successfully removed contributor ${req.contributorID}`,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        error: 'Failed to delete contributor',
+      });
+    }
   },
 
   addApplicant: async (req, res) => {

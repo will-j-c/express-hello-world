@@ -2,6 +2,7 @@
 const jwt = require('jsonwebtoken');
 const CommentModel = require('../models/commentModel');
 const UserModel = require('../models/userModel');
+const ContributorModel = require('../models/contributorModel');
 const ProjectModel = require('../models/projectModel');
 
 const userAuth = {
@@ -37,34 +38,70 @@ const userAuth = {
   },
 
   isAuthorized: async (req, res, next) => {
-    const commentRoute = '/api/v1/comments';
-    const projectRoute = '/api/v1/projects';
-    const comment =
-      (await CommentModel.findOne({ _id: req.params.id }, { user_id: 1, _id: 0 })) || null;
-    const user = (await UserModel.findOne({ username: req.authUser.username }, { _id: 1 })) || null;
-    const project =
-      (await ProjectModel.findOne({ slug: req.params.slug }, { user_id: 1, _id: 0 })) || null;
-    if (req.baseUrl === commentRoute) {
-      // Compare the comment user_id to the user making the request
+    const route = req.baseUrl.split('/').pop();
+
+    const user = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
+
+    switch (route) {
+      case 'comments':
+        await commentsAuth();
+        break;
+      case 'contributors':
+        await contributorsAuth();
+        break;
+      case 'projects':
+        await projectsAuth();
+        break;
+      default:
+        return next();
+    }
+
+    async function commentsAuth() {
+      const comment = await CommentModel.findOne({ _id: req.params.id }, { user_id: 1, _id: 0 });
       if (comment.user_id.toString() === user._id.toString()) {
         return next();
       }
-      return res.status(403).json();
+      return res
+        .status(403)
+        .json({ error: 'User is not authorized to change Comments details for this project' });
     }
-    if (req.baseUrl === projectRoute) {
+
+    async function projectsAuth() {
       // If it's a request to unfollow a project
       if (req.params.username) {
         if (req.params.username === req.authUser.username) {
           return next();
         }
-        return res.status(403).json();
+        return res.status(403).json({
+          error: 'User is not authorized to change Project details for this project',
+        });
       }
+      const project = await ProjectModel.findOne({ slug: req.params.slug }, { user_id: 1, _id: 0 });
       if (project.user_id.toString() === user._id.toString()) {
         return next();
       }
-      return res.status(403).json();
+      return res.status(403).json({
+        error: 'User is not authorized to change Project details for this project',
+      });
     }
-    return next();
+    async function contributorsAuth() {
+      let projectFilter = null;
+      const contributor = await ContributorModel.findOne({ _id: req.params.id });
+      if (req.body.project_slug) {
+        projectFilter = { slug: req.body.project_slug };
+      } else if (contributor) {
+        projectFilter = { _id: contributor.project_id };
+      }
+      const project = await ProjectModel.findOne(projectFilter);
+      if (project.user_id.toString() === user._id.toString()) {
+        req.contributorID = contributor?._id;
+        req.projectID = project._id;
+        return next();
+      }
+      return res.status(403).json({
+        error: 'User is not authorized to change Contributor details for this project',
+      });
+    }
   },
 };
 

@@ -193,7 +193,7 @@ const controller = {
         project_id: project._id,
       });
       if (response.deletedCount) {
-        return res.status(205).json();
+        return res.status(200).json();
       }
       return res.status(204).json();
     } catch (error) {
