@@ -2,6 +2,9 @@ const jwt = require('jsonwebtoken');
 const UserModel = require('../models/userModel');
 const ProjectModel = require('../models/projectModel');
 const UsersRelationshipModel = require('../models/usersRelationship');
+const validator = require('../validations/userValidation');
+const validSkills = require('../seeds/predefined-data/skills.json');
+const { profile } = require('../validations/userValidation');
 
 const controller = {
   showAllUsers: async (req, res) => {
@@ -41,9 +44,42 @@ const controller = {
     }
   },
   editProfile: async (req, res) => {
-    console.log(req.body);
+    const { name, tagline, skills, interests, socmed } = req.body;
     try {
-      await UserModel.findOneAndUpdate({ username: req.params.username }, req.body);
+      await validator.profile.validateAsync({
+        name,
+        tagline,
+        skills,
+        interests,
+        socmed,
+      });
+    } catch (error) {
+      console.log(error.message);
+      return res.status(400).json({
+        error: 'Invalid input',
+      });
+    }
+    try {
+      const profileOwner = await UserModel.findOne({ username: req.authUser.username });
+      const user = await UserModel.findOne({ username: req.params.username });
+
+      // authorisation check: whether user is the project owner
+      if (user._id.toString() !== profileOwner._id.toString()) {
+        return res.status(401).json({
+          error: 'User is not authorised to change this project',
+        });
+      }
+
+      const skillsArr = skills
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => validSkills.includes(item));
+      const interestsArr = interests.split(',').map((item) => item.trim());
+      const socmedArr = socmed.split(',').map((item) => item.trim());
+      await UserModel.findOneAndUpdate(
+        { username: req.params.username },
+        { name, tagline, skillsArr, interestsArr, socmedArr }
+      );
       return res.status(201).json();
     } catch (error) {
       console.log(error.message);

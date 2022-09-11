@@ -74,7 +74,7 @@ const controller = {
   },
 
   add: async (req, res) => {
-    const { 
+    const {
       project_slug,
       title,
       skills,
@@ -83,7 +83,7 @@ const controller = {
       commitmentLevel,
       available_slots,
       remuneration,
-      city
+      city,
     } = req.body;
 
     try {
@@ -93,7 +93,7 @@ const controller = {
         is_remote,
         description,
         commitmentLevel,
-        available_slots
+        available_slots,
       });
     } catch (error) {
       console.log(error);
@@ -148,32 +148,19 @@ const controller = {
         error: 'Failed to fetch data',
       });
     }
-
   },
 
-  update: async (req, res) => {
+  update: async (req, res) => {},
 
-  },
+  delete: async (req, res) => {},
 
-  delete: async (req, res) => {
+  addApplicant: async (req, res) => {},
 
-  },
+  removeApplicant: async (req, res) => {},
 
-  addApplicant: async (req, res) => {
+  acceptApplicant: async (req, res) => {},
 
-  },
-
-  removeApplicant: async (req, res) => {
-
-  },
-
-  acceptApplicant: async (req, res) => {
-
-  },
-
-  rejectApplicant: async (req, res) => {
-
-  },
-}
+  rejectApplicant: async (req, res) => {},
+};
 
 module.exports = controller;

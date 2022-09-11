@@ -16,9 +16,9 @@ const userValidation = {
   }),
   profile: Joi.object({
     name: Joi.string().min(3).max(30),
-    skills: Joi.array().items(Joi.string()),
-    interests: Joi.array().items(Joi.string()),
-    socmed: Joi.array().items(Joi.string()),
+    skills: Joi.string(),
+    interests: Joi.string(),
+    socmed: Joi.string(),
     tagline: Joi.string(),
     profile_pic_url: Joi.string(),
   }),
