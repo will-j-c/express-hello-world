@@ -80,7 +80,7 @@ const controller = {
       skills,
       is_remote,
       description,
-      commitmentLevel,
+      commitment_level,
       available_slots,
       remuneration,
       city
@@ -92,7 +92,7 @@ const controller = {
         skills,
         is_remote,
         description,
-        commitmentLevel,
+        commitment_level,
         available_slots
       });
     } catch (error) {
@@ -136,7 +136,7 @@ const controller = {
         skills: skillsArr,
         is_remote,
         description,
-        commitmentLevel,
+        commitment_level,
         available_slots,
         city,
         remuneration,
