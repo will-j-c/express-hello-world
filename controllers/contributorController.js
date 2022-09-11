@@ -9,7 +9,10 @@ const validator = require('../validations/contributorValidation');
 const validSkills = require('../seeds/predefined-data/skills.json');
 
 const getData = async (req) => {
-  const user = await UserModel.findOne({ username: req.authUser.username });
+  let user = await UserModel.findOne({ username: req.authUser.username });
+  if (req.params.username) {
+    user = await UserModel.findOne({ username: req.params.username });
+  }
   const contributor = await ContributorModel.findOne({ _id: req.params.id });
   const relation = await RelationshipModel.findOne({ 
     user_id: user._id,
@@ -227,7 +230,18 @@ const controller = {
   },
 
   acceptApplicant: async (req, res) => {
-
+    try {
+      const [, , relation] = await getData(req);
+      await relation.updateOne({ state: 'accepted' });
+      return res.json({
+        message: `Updated relationship ${relation._id} state to accepted`,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: 'Failed to update contributor status',
+      });
+    }
   },
 
   rejectApplicant: async (req, res) => {
