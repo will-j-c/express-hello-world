@@ -47,7 +47,16 @@ const controller = {
     }
   },
   editProfile: async (req, res) => {
-    const { name, tagline, skills, interests, socmed } = req.body;
+    const { name, tagline, skills, interests, linkedin, github, twitter, facebook } = req.body;
+    const socmedFormat = {
+      facebook: req.body.facebook,
+      linkedin: req.body.linkedin,
+      github: req.body.github,
+      twitter: req.body.twitter,
+    };
+    //remove the empty attribute from socmedFormat
+    const socmed = Object.fromEntries(Object.entries(socmedFormat).filter(([_, v]) => v != ''));
+
     try {
       await validator.profile.validateAsync({
         name,
@@ -65,24 +74,21 @@ const controller = {
     try {
       const profileOwner = await UserModel.findOne({ username: req.authUser.username });
       const user = await UserModel.findOne({ username: req.params.username });
-
       // authorisation check: whether user is the project owner
       if (user?._id.toString() !== profileOwner._id.toString()) {
         return res.status(401).json({
           error: 'User is not authorised to change this profile',
         });
       }
-
       const skillsArr = skills
         .split(',')
         .map((item) => item.trim())
         .filter((item) => validSkills.includes(item));
       const interestsArr = interests.split(',').map((item) => item.trim());
 
-      const socmedArr = socmed.split(',').map((item) => item.trim());
       await UserModel.findOneAndUpdate(
         { username: req.params.username },
-        { name, tagline, skillsArr, interestsArr, socmedArr }
+        { name, tagline, skillsArr, interestsArr, socmed }
       );
       return res.status(201).json();
     } catch (error) {

@@ -20,7 +20,7 @@ const userValidation = {
     name: Joi.string().min(3).max(30),
     skills: Joi.string(),
     interests: Joi.string(),
-    socmed: Joi.string(),
+    socmed: Joi.object(),
     tagline: Joi.string(),
     profile_pic_url: Joi.string(),
   }),
