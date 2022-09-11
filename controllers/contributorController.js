@@ -1,6 +1,8 @@
+/* eslint-disable no-underscore-dangle */
 const ContributorModel = require('../models/contributorModel');
 const ProjectModel = require('../models/projectModel');
 const RelationshipModel = require('../models/contributorsRelationship');
+const UserModel = require('../models/userModel');
 
 const controller = {
   showAll: async (req, res) => {
@@ -69,6 +71,48 @@ const controller = {
   },
 
   add: async (req, res) => {
+    // TO DO: add validator
+    const { project_slug, title, skills, is_remote, description, commitmentLevel, available_slots } = req.body;
+    try {
+      const user = await UserModel.findOne({ username: req.authUser.username });
+      const project = await ProjectModel.findOne({ slug: project_slug });
+
+      // authorisation check: whether user is the project owner
+      if (project.user_id.toString() !== user._id.toString()) {
+        return res.status(401).json({
+          error: 'User is not authorised to change this project',
+        });
+      }
+
+      // check if there exists a contributor with the same name in database
+      const existingContributor = await ContributorModel.find({
+        project_id: project._id,
+        title,
+      });
+
+      if (existingContributor.length > 0) {
+        return res.status(409).json({
+          error: 'There is existing contributor with the same title',
+        });
+      }
+
+      const newContributor = await ContributorModel.create({
+        title,
+        project_id: project._id,
+        // TO DO: change skills to array
+        skills,
+        is_remote,
+        description,
+        commitmentLevel,
+        available_slots
+      });
+
+      return res.status(201).json(newContributor);
+    } catch (error) {
+      return res.status(500).json({
+        error: 'Failed to fetch data',
+      });
+    }
 
   },
 
