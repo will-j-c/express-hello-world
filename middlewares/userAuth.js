@@ -1,4 +1,8 @@
+/* eslint-disable no-underscore-dangle */
+const { isError } = require('joi');
 const jwt = require('jsonwebtoken');
+const CommentModel = require('../models/commentModel');
+const UserModel = require('../models/userModel');
 
 const userAuth = {
   isAuthenticated: (req, res, next) => {
@@ -32,9 +36,18 @@ const userAuth = {
     });
   },
 
-  isAuthorized: (req, res, next) => {
-    // TO DO: check if user is authorized
-    next();
+  isAuthorized: async (req, res, next) => {
+    const commentRoute = '/api/v1/comments';
+    if (req.baseUrl === commentRoute) {
+      // Compare the comment user_id to the user making the request
+      const comment = await CommentModel.findOne({ _id: req.params.id }, { user_id: 1, _id: 0 });
+      const user = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
+      if (comment.user_id.toString() === user._id.toString()) {
+        return next();
+      }
+      return res.status(403).json();
+    }
+    return next();
   },
 };
 
