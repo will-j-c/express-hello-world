@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const userAuth = {
   isAuthenticated: (req, res, next) => {
-    const authHeader = req.header('Authorisation');
+    const authHeader = req.header('Authorization');
     if (!authHeader) {
       return res.status(401).json({
         error: 'Authentication details empty',
@@ -32,7 +32,7 @@ const userAuth = {
     });
   },
 
-  isAuthorised: (req, res, next) => {
+  isAuthorized: (req, res, next) => {
     // TO DO: check if user is authorized
     next();
   },
