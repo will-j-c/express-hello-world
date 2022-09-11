@@ -32,7 +32,7 @@ const userAuth = {
     });
   },
 
-  isAuthorised: (req, res, next) => {
+  isAuthorized: (req, res, next) => {
     // TO DO: check if user is authorized
     next();
   },

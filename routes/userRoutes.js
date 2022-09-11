@@ -7,8 +7,8 @@ router.get('/', userController.showAllUsers);
 router.post('/:token/activate', userController.activateAccount);
 router.get('/:username/following', userController.showFollowingUsers);
 router.get('/:username/followers', userController.showFollowerUsers);
-router.post('/:username/follow', userController.followUser);
-router.delete('/:username/unfollow', userController.unfollowUser);
+router.post('/:username/follow', userAuth.isAuthenticated, userController.followUser);
+router.delete('/:username/unfollow', userAuth.isAuthenticated, userController.unfollowUser);
 router.get('/:username', userController.showProfile);
 router.delete('/:username', userController.deleteAccount);
 
