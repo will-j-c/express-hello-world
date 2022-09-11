@@ -7,13 +7,13 @@ const router = express.Router();
 router.put(
   '/:id/accept/:userId',
   authMiddleware.isAuthenticated,
-  authMiddleware.isAuthorised,
+  authMiddleware.isAuthorized,
   controller.acceptApplicant
 );
 router.put(
   '/:id/reject/:userId',
   authMiddleware.isAuthenticated,
-  authMiddleware.isAuthorised,
+  authMiddleware.isAuthorized,
   controller.rejectApplicant
 );
 router.post('/:id/apply', authMiddleware.isAuthenticated, controller.addApplicant);
@@ -22,14 +22,14 @@ router.get('/:id', controller.showOne);
 router.delete(
   '/:id',
   authMiddleware.isAuthenticated,
-  authMiddleware.isAuthorised,
+  authMiddleware.isAuthorized,
   controller.delete
 );
 // eslint-disable-next-line prettier/prettier
 router.put(
   '/:id',
   authMiddleware.isAuthenticated,
-  authMiddleware.isAuthorised,
+  authMiddleware.isAuthorized,
   controller.update
 );
 router.get('/', controller.showAll);

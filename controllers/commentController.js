@@ -2,6 +2,7 @@
 const CommentModel = require('../models/commentModel');
 const ProjectModel = require('../models/projectModel');
 const UserModel = require('../models/userModel');
+const commentValidation = require('../validations/commentValidation');
 
 const controller = {
   postComment: async (req, res) => {
@@ -15,15 +16,23 @@ const controller = {
       if (!projectId) {
         return res.status(400).json();
       }
-      // Validation of comment TODO
-      const validatedComment = {
-        user_id: userId._id,
-        project_id: projectId._id,
-        content: req.body.content,
-      };
-      console.log(validatedComment);
+      // Validations
+      let validatedResults = null;
+      try {
+        const comment = {
+          user_id: userId._id,
+          project_id: projectId._id,
+          content: req.body.content,
+        };
+        validatedResults = await commentValidation.post.validateAsync(comment);
+      } catch (error) {
+        console.log(error);
+        return res.status(400).json({
+          error: 'Validation failed',
+        });
+      }
       // Create new comment
-      await CommentModel.create(validatedComment);
+      await CommentModel.create(validatedResults);
       return res.json();
     } catch (error) {
       console.log(error);

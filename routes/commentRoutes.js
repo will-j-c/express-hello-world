@@ -7,19 +7,19 @@ const router = express.Router();
 router.post(
   '/:slug',
   authMiddleware.isAuthenticated,
-  authMiddleware.isAuthorised,
+  authMiddleware.isAuthorized,
   commentController.postComment
 );
 router.put(
   '/:id',
   authMiddleware.isAuthenticated,
-  authMiddleware.isAuthorised,
+  authMiddleware.isAuthorized,
   commentController.editComment
 );
 router.delete(
   '/:id',
   authMiddleware.isAuthenticated,
-  authMiddleware.isAuthorised,
+  authMiddleware.isAuthorized,
   commentController.deleteComment
 );
 
