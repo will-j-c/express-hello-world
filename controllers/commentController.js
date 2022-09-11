@@ -5,6 +5,7 @@ const UserModel = require('../models/userModel');
 const commentValidation = require('../validations/commentValidation');
 
 const callDatabase = async (req) => {
+  console.log(req.params.id);
   const projectId = await ProjectModel.findOne({ slug: req.params.slug }, { _id: 1 });
   const userId = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
   const commentId = await CommentModel.findOne({ _id: req.params.id }, { _id: 1 });
