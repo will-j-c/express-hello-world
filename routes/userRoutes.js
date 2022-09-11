@@ -11,6 +11,6 @@ router.post('/:username/follow', userAuth.isAuthenticated, userController.follow
 router.put('/:username', userAuth.isAuthenticated, userController.editProfile);
 router.delete('/:username/unfollow', userAuth.isAuthenticated, userController.unfollowUser);
 router.get('/:username', userController.showProfile);
-router.delete('/:username', userController.deleteAccount);
+router.delete('/:username', userAuth.isAuthenticated, userController.deleteAccount);
 
 module.exports = router;

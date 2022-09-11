@@ -9,7 +9,7 @@
     ],
     "is_remote": true,
     "description": "Making the website look fabulous",
-    "commitmentLevel": "Medium",
+    "commitment_level": "Medium",
     "remuneration": "$100/week",
     "available_slots": 1
   },
@@ -22,7 +22,7 @@
     ],
     "is_remote": true,
     "description": "Make magic happen - build everything by yourself from scratch",
-    "commitmentLevel": "High",
+    "commitment_level": "High",
     "available_slots": 2
   },
   {
@@ -35,7 +35,7 @@
     "is_remote": false,
     "city": "Singapore, Singapore",
     "description": "Make the money move",
-    "commitmentLevel": "Low",
+    "commitment_level": "Low",
     "available_slots": 1
   },
   {
@@ -52,7 +52,7 @@
     "is_remote": true,
     "city": "Ho Chi Minh, Vietnam",
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    "commitmentLevel": "Medium",
+    "commitment_level": "Medium",
     "remuneration": "$250/week",
     "available_slots": 3
   },
@@ -66,7 +66,7 @@
     ],
     "is_remote": true,
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    "commitmentLevel": "High",
+    "commitment_level": "High",
     "available_slots": 2
   }
 ]

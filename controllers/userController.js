@@ -2,6 +2,9 @@ const jwt = require('jsonwebtoken');
 const UserModel = require('../models/userModel');
 const ProjectModel = require('../models/projectModel');
 const UsersRelationshipModel = require('../models/usersRelationship');
+const ProjectsRelationshipModel = require('../models/projectsRelationship');
+const ContributorRelationshipModel = require('../models/contributorsRelationship');
+const ContributorModel = require('../models/contributorModel');
 const validator = require('../validations/userValidation');
 const validSkills = require('../seeds/predefined-data/skills.json');
 const { profile } = require('../validations/userValidation');
@@ -24,7 +27,6 @@ const controller = {
     }
   },
 
-  //TODO: Considering about AuthUser , who is not profileOwner
   showProfile: async (req, res) => {
     const username = req.params.username;
     try {
@@ -64,7 +66,7 @@ const controller = {
       const user = await UserModel.findOne({ username: req.params.username });
 
       // authorisation check: whether user is the project owner
-      if (user._id.toString() !== profileOwner._id.toString()) {
+      if (user?._id.toString() !== profileOwner._id.toString()) {
         return res.status(401).json({
           error: 'User is not authorised to change this project',
         });
@@ -181,7 +183,38 @@ const controller = {
     }
   },
 
-  deleteAccount: async (req, res) => {},
+  deleteAccount: async (req, res) => {
+    const profileOwner = await UserModel.findOne({ username: req.authUser.username });
+    const user = await UserModel.findOne({ username: req.params.username });
+    // authorisation check: whether user is the project owner
+    if (user?._id.toString() !== profileOwner?._id.toString()) {
+      return res.status(401).json({
+        error: 'User is not authorised to change this project',
+      });
+    }
+
+    try {
+      const hostProjects = await ProjectModel.find({ user_id: profileOwner?._id }, { _id: 1 });
+      if (hostProjects.length) {
+        for (let i = 0, len = hostProjects.length; i < len; i += 1) {
+          await ContributorModel.deleteMany({ project_id: hostProjects[i]?._id });
+        }
+        hostProjects.deleteMany();
+      }
+      // await ContributorRelationshipModel.deleteMany({ user_id: profileOwner?._id });
+      // await ProjectsRelationshipModel.deleteMany({ user_id: profileOwner._id });
+      // await ProjectsRelationshipModel.deleteMany({ user_id: profileOwner._id });
+
+      profileOwner?.deleteOne();
+
+      return res.status(200).json();
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: 'Failed to delete account',
+      });
+    }
+  },
 
   activateAccount: async (req, res) => {
     const { token } = req.params;
