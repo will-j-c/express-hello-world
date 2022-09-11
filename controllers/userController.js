@@ -78,6 +78,7 @@ const controller = {
         .map((item) => item.trim())
         .filter((item) => validSkills.includes(item));
       const interestsArr = interests.split(',').map((item) => item.trim());
+
       const socmedArr = socmed.split(',').map((item) => item.trim());
       await UserModel.findOneAndUpdate(
         { username: req.params.username },
