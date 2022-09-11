@@ -8,6 +8,9 @@ const commentValidation = {
     project_id: Joi.required(),
     content: Joi.string().min(1).max(700).required(),
   }),
+  edit: Joi.object({
+    content: Joi.string().min(1).max(700).required(),
+  }),
 };
 
 module.exports = commentValidation;
