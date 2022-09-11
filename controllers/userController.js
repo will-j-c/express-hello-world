@@ -40,6 +40,18 @@ const controller = {
       });
     }
   },
+  editProfile: async (req, res) => {
+    console.log(req.body);
+    try {
+      await UserModel.findOneAndUpdate({ username: req.params.username }, req.body);
+      return res.status(201).json();
+    } catch (error) {
+      console.log(error.message);
+      return res.status(500).json({
+        error: 'Failed to edit profile',
+      });
+    }
+  },
 
   showFollowingUsers: async (req, res) => {
     const username = req.params.username;
