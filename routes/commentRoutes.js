@@ -1,5 +1,26 @@
 const express = require('express');
+const commentController = require('../controllers/commentController');
+const authMiddleware = require('../middlewares/userAuth');
 
 const router = express.Router();
+
+router.post(
+  '/:slug',
+  authMiddleware.isAuthenticated,
+  authMiddleware.isAuthorized,
+  commentController.postComment
+);
+router.put(
+  '/:id',
+  authMiddleware.isAuthenticated,
+  authMiddleware.isAuthorized,
+  commentController.editComment
+);
+router.delete(
+  '/:id',
+  authMiddleware.isAuthenticated,
+  authMiddleware.isAuthorized,
+  commentController.deleteComment
+);
 
 module.exports = router;
