@@ -6,7 +6,7 @@ const contributorValidation = {
     title: Joi.string().min(3).max(30).required(),
     skills: Joi.string().required(),
     is_remote: Joi.boolean().required(),
-    commitmentLevel: Joi.string().required(),
+    commitmentLevel: Joi.string().valid('high', 'medium', 'low').required(),
     description: Joi.string().required(),
     available_slots: Joi.number().required(),
   }),

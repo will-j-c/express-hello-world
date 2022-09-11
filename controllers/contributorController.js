@@ -5,6 +5,7 @@ const RelationshipModel = require('../models/contributorsRelationship');
 const UserModel = require('../models/userModel');
 
 const validator = require('../validations/contributorValidation');
+const validSkills = require('../seeds/predefined-data/skills.json');
 
 const controller = {
   showAll: async (req, res) => {
@@ -73,7 +74,6 @@ const controller = {
   },
 
   add: async (req, res) => {
-    // TO DO: add validator
     const { project_slug, title, skills, is_remote, description, commitmentLevel, available_slots } = req.body;
     let validatedResults = null;
 
@@ -116,11 +116,15 @@ const controller = {
         });
       }
 
+      const skillsArr = skills
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => validSkills.includes(item));
+
       const newContributor = await ContributorModel.create({
         title,
         project_id: project._id,
-        // TO DO: change skills to array
-        skills,
+        skills: skillsArr,
         is_remote,
         description,
         commitmentLevel,
