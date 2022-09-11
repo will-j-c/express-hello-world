@@ -10,16 +10,28 @@ const validSkills = require('../seeds/predefined-data/skills.json');
 
 const getData = async (req) => {
   const user = await UserModel.findOne({ username: req.authUser.username });
-  let project = null;
+  console.log(`userid is ${user._id}`);
+  let projectFilter = null;
+  let isProjectOwner = null;
   const contributor = await ContributorModel.findOne({ _id: req.params.id });
-  if (req.body.project_slug) {
-    project = await ProjectModel.findOne({ slug: req.body.project_slug });
-  } else if (contributor) {
-    project = await ProjectModel.findOne({ _id: contributor.project_id });
+
+  let relations = null;
+  if (contributor) {
+    relations = await RelationshipModel.find({ contributor_id: contributor._id });
   }
+
+  if (req.body.project_slug) {
+    projectFilter = { slug: req.body.project_slug };
+  } else if (contributor) {
+    projectFilter = { _id: contributor.project_id };
+  }
+
+  const project = await ProjectModel.findOne(projectFilter);
+  isProjectOwner = project.user_id.toString() === user._id.toString();
+
   // TO DO: once authorization middleware is ready, can remove this
-  const isProjectOwner = project.user_id.toString() === user._id.toString();
-  return [user, project, contributor, isProjectOwner];
+  // const isProjectOwner = project.user_id.toString() === user._id.toString();
+  return [user, project, contributor, isProjectOwner, relations];
 };
 
 const controller = {
@@ -154,7 +166,7 @@ const controller = {
       });
     }
 
-    const [, , contributor, isProjectOwner] = await getData(req);
+    const [, , contributor, isProjectOwner, relations] = await getData(req);
 
     // authorisation check: whether user is the project owner
     if (!isProjectOwner) {
@@ -168,6 +180,14 @@ const controller = {
       .map((item) => item.trim())
       .filter((item) => validSkills.includes(item));
     data.skills = skillsArr;
+
+    // cannot change available slots below the # of accepted users
+    const acceptedRelations = relations.filter((relation) => relation.state === 'accepted');
+    if (data.available_slots < acceptedRelations.length) {
+      return res.status(400).json({
+        error: 'Invalid input',
+      });
+    }
 
     // Find and update the document
     try {

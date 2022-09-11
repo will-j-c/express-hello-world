@@ -28,5 +28,10 @@
     "user_id": "to be updated",
     "contributor_id": "to be updated",
     "state": "rejected"
+  },
+  {
+    "user_id": "to be updated",
+    "contributor_id": "to be updated",
+    "state": "accepted"
   }
 ]

@@ -21,6 +21,8 @@ const createcontributorsRelationships = async (relations) => {
   relations[4].contributor_id = contributors[0]._id;
   relations[5].user_id = users[3]._id;
   relations[5].contributor_id = contributors[0]._id;
+  relations[6].user_id = users[4]._id;
+  relations[6].contributor_id = contributors[0]._id;
 
   for await (const relation of relations) {
     try {
