@@ -2,6 +2,13 @@ const jwt = require('jsonwebtoken');
 const UserModel = require('../models/userModel');
 const ProjectModel = require('../models/projectModel');
 const UsersRelationshipModel = require('../models/usersRelationship');
+const ProjectsRelationshipModel = require('../models/projectsRelationship');
+const ContributorRelationshipModel = require('../models/contributorsRelationship');
+const ContributorModel = require('../models/contributorModel');
+const CommentModel = require('../models/commentModel');
+const validator = require('../validations/userValidation');
+const validSkills = require('../seeds/predefined-data/skills.json');
+const { profile } = require('../validations/userValidation');
 
 const controller = {
   showAllUsers: async (req, res) => {
@@ -29,11 +36,23 @@ const controller = {
       if (!profileOwner) {
         return res.status(404).json();
       }
-      const projects = await ProjectModel.find(
+      const hostedProjects = await ProjectModel.find(
         { user_id: profileOwner._id },
         { __v: 0, _id: 0 }
       ).lean();
-      return res.json({ profileOwner, projects });
+      const hostedPublicProjects = await ProjectModel.aggregate([
+        { $match: { state: 'published', user_id: profileOwner._id } },
+        { $sort: { updatedAt: -1 } },
+        { $project: { __v: 0, user_id: 0 } },
+      ]);
+      // show ContributedProject with status : accecpted
+      const contributedJobs = await ContributorRelationshipModel.find({
+        user_id: profileOwner._id,
+        state: 'accepted',
+      });
+      let contributedProjects = [];
+      for (let i = 0, len = contributedJobs.length; i < len; i++) {}
+      return res.json({ profileOwner, hostedProjects, hostedPublicProjects, contributedJobs });
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch user by username from database',
