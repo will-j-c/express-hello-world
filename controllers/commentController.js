@@ -47,8 +47,37 @@ const controller = {
       });
     }
   },
-  editComment: async (rew, res) => {
-    res.send('Message edited');
+  editComment: async (req, res) => {
+    try {
+      const [, userId, commentId] = await callDatabase(req);
+      // Check user and comment exists
+      if (!userId) {
+        return res.status(403).json();
+      }
+      if (!commentId) {
+        return res.status(400).json();
+      }
+      // Validations
+      let validatedResults = null;
+      try {
+        const comment = {
+          content: req.body.content,
+        };
+        validatedResults = await commentValidation.edit.validateAsync(comment);
+      } catch (error) {
+        console.log(error);
+        return res.status(400).json({
+          error: 'Validation failed',
+        });
+      }
+      await CommentModel.updateOne(commentId, validatedResults);
+      return res.json();
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: 'Failed to edit comment',
+      });
+    }
   },
   deleteComment: async (req, res) => {
     try {
