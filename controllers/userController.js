@@ -29,7 +29,7 @@ const controller = {
       if (!profileOwner) {
         return res.status(404).json();
       }
-      const projects = await ProjectModel.findOne(
+      const projects = await ProjectModel.find(
         { user_id: profileOwner._id },
         { __v: 0, _id: 0 }
       ).lean();
