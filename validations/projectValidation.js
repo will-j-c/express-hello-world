@@ -21,16 +21,3 @@ const ProjectSchema = Joi.object({
 });
 
 module.exports = ProjectSchema;
-
-// schema.validate({ username: 'abc', birth_year: 1994 });
-// -> { value: { username: 'abc', birth_year: 1994 } }
-
-// schema.validate({});
-// -> { value: {}, error: '"username" is required' }
-
-// Also -
-
-// try {
-//     const value = await schema.validateAsync({ username: 'abc', birth_year: 1994 });
-// }
-// catch (err) { }

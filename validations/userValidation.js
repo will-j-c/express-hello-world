@@ -1,3 +1,5 @@
+/* eslint-disable prefer-regex-literals */
+/* eslint-disable react/forbid-prop-types */
 const Joi = require('joi');
 
 const userValidation = {
