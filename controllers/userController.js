@@ -82,14 +82,12 @@ const controller = {
   },
   followUser: async (req, res) => {
     try {
-      const token = req.header('Authorization').slice(7);
-      const verified = jwt.verify(token, process.env.JWT_SECRET_ACCESS);
       const followee = await UserModel.findOne(
         { username: req.params.username },
         { _id: 1 }
       ).lean();
       const follower = await UserModel.findOne(
-        { username: verified.data.username },
+        { username: req.authUser.username },
         { _id: 1 }
       ).lean();
 
@@ -111,17 +109,14 @@ const controller = {
   },
   unfollowUser: async (req, res) => {
     try {
-      const token = req.header('Authorization').slice(7);
-      const verified = jwt.verify(token, process.env.JWT_SECRET_ACCESS);
       const followee = await UserModel.findOne(
         { username: req.params.username },
         { _id: 1 }
       ).lean();
       const follower = await UserModel.findOne(
-        { username: verified.data.username },
+        { username: req.authUser.username },
         { _id: 1 }
       ).lean();
-
       const response = await UsersRelationshipModel.findOneAndDelete({
         follower: follower._id,
         followee: followee._id,
