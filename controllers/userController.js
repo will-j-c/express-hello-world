@@ -69,7 +69,7 @@ const controller = {
       // authorisation check: whether user is the project owner
       if (user?._id.toString() !== profileOwner._id.toString()) {
         return res.status(401).json({
-          error: 'User is not authorised to change this project',
+          error: 'User is not authorised to change this profile',
         });
       }
 
