@@ -10,9 +10,16 @@ const validSkills = require('../seeds/predefined-data/skills.json');
 
 const getData = async (req) => {
   const user = await UserModel.findOne({ username: req.authUser.username });
-  const project = await ProjectModel.findOne({ slug: req.body.project_slug });
+  let project = null;
+  const contributor = await ContributorModel.findOne({ _id: req.params.id });
+  if (req.body.project_slug) {
+    project = await ProjectModel.findOne({ slug: req.body.project_slug });
+  } else if (contributor) {
+    project = await ProjectModel.findOne({ _id: contributor.project_id });
+  }
+  // TO DO: once authorization middleware is ready, can remove this
   const isProjectOwner = project.user_id.toString() === user._id.toString();
-  return [user, project, isProjectOwner];
+  return [user, project, contributor, isProjectOwner];
 };
 
 const controller = {
@@ -82,26 +89,10 @@ const controller = {
   },
 
   add: async (req, res) => {
-    const {
-      title,
-      skills,
-      is_remote,
-      description,
-      commitment_level,
-      available_slots,
-      remuneration,
-      city
-    } = req.body;
-
+    const data = { ...req.body };
+    delete data.project_slug;
     try {
-      await validator.add.validateAsync({
-        title,
-        skills,
-        is_remote,
-        description,
-        commitment_level,
-        available_slots
-      });
+      await validator.details.validateAsync(data);
     } catch (error) {
       console.log(error);
       return res.status(400).json({
@@ -110,7 +101,7 @@ const controller = {
     }
 
     try {
-      const [user, project, isProjectOwner] = await getData(req);
+      const [, project, , isProjectOwner] = await getData(req);
 
       // authorisation check: whether user is the project owner
       if (!isProjectOwner) {
@@ -118,6 +109,8 @@ const controller = {
           error: 'User is not authorised to change this project',
         });
       }
+
+      const { skills, title } = data;
 
       // check if there exists a contributor with the same name in database
       const existingContributor = await ContributorModel.find({
@@ -136,29 +129,60 @@ const controller = {
         .map((item) => item.trim())
         .filter((item) => validSkills.includes(item));
 
-      const newContributor = await ContributorModel.create({
-        title,
-        project_id: project._id,
-        skills: skillsArr,
-        is_remote,
-        description,
-        commitment_level,
-        available_slots,
-        city,
-        remuneration,
-      });
+      data.skills = skillsArr;
+      data.project_id = project._id;
+
+      const newContributor = await ContributorModel.create(data);
 
       return res.status(201).json(newContributor);
     } catch (error) {
+      console.log(`error: ${error}`);
       return res.status(500).json({
         error: 'Failed to fetch data',
       });
     }
-
   },
 
   update: async (req, res) => {
+    let data = null;
+    try {
+      data = await validator.details.validateAsync(req.body);
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        error: 'Invalid input',
+      });
+    }
 
+    const [, , contributor, isProjectOwner] = await getData(req);
+
+    // authorisation check: whether user is the project owner
+    if (!isProjectOwner) {
+      return res.status(401).json({
+        error: 'User is not authorised to change this project',
+      });
+    }
+
+    const skillsArr = data.skills
+      .split(',')
+      .map((item) => item.trim())
+      .filter((item) => validSkills.includes(item));
+    data.skills = skillsArr;
+
+    // Find and update the document
+    try {
+      const updatedContributor = await ContributorModel.findOneAndUpdate(
+        { _id: contributor._id },
+        data,
+        { new: true }
+      );
+      return res.status(200).json(updatedContributor);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: 'Failed to edit contributor',
+      });
+    }
   },
 
   delete: async (req, res) => {

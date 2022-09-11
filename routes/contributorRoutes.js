@@ -4,6 +4,7 @@ const authMiddleware = require('../middlewares/userAuth');
 
 const router = express.Router();
 
+// TO DO: add authorization middleware later once ready
 router.put('/:id/accept/:userId', authMiddleware.isAuthenticated, controller.acceptApplicant);
 router.put('/:id/reject/:userId', authMiddleware.isAuthenticated, controller.rejectApplicant);
 router.post('/:id/apply', authMiddleware.isAuthenticated, controller.addApplicant);
