@@ -23,7 +23,7 @@ const userAuth = {
     const verified = jwt.verify(token, process.env.JWT_SECRET_ACCESS);
 
     if (verified) {
-      res.locals.userAuth = verified;
+      req.authUser = verified.data;
       return next();
     }
 
