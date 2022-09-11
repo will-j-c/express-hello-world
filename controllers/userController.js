@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const UserModel = require('../models/userModel');
 const ProjectModel = require('../models/projectModel');
 const UsersRelationshipModel = require('../models/usersRelationship');
@@ -12,13 +13,14 @@ const controller = {
         { $project: { hash: 0 } },
       ]);
       console.log(users);
-      return res.status(200).json(users);
+      return res.json(users);
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch users from database',
       });
     }
   },
+
   //TODO: Considering about AuthUser , who is not profileOwner
   showProfile: async (req, res) => {
     const username = req.params.username;
@@ -31,13 +33,14 @@ const controller = {
         { user_id: profileOwner._id },
         { __v: 0, _id: 0 }
       ).lean();
-      return res.status(200).json({ profileOwner, projects });
+      return res.json({ profileOwner, projects });
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch user by username from database',
       });
     }
   },
+
   showFollowingUsers: async (req, res) => {
     const username = req.params.username;
     const user = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
@@ -50,13 +53,14 @@ const controller = {
         { follower: user._id },
         { followee: 1 }
       ).populate({ path: 'followee', select: '-email -__v -hash' });
-      return res.status(200).json(followingUsers);
+      return res.json(followingUsers);
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch followingUsers from database',
       });
     }
   },
+
   showFollowerUsers: async (req, res) => {
     const username = req.params.username;
     const user = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
@@ -69,15 +73,64 @@ const controller = {
         { followee: user._id },
         { follower: 1 }
       ).populate({ path: 'follower', select: '-email -__v -hash' });
-      return res.status(200).json(followerUsers);
+      return res.json(followerUsers);
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch followingUsers from database',
       });
     }
   },
-  addFollowUser: async (req, res) => {},
+  followUser: async (req, res) => {
+    try {
+      const token = req.header('Authorization').slice(7);
+      const verified = jwt.verify(token, process.env.JWT_SECRET_ACCESS);
+      const followee = await UserModel.findOne(
+        { username: req.params.username },
+        { _id: 1 }
+      ).lean();
+      const follower = await UserModel.findOne(
+        { username: verified.data.username },
+        { _id: 1 }
+      ).lean();
+
+      const updatedRelationship = await UsersRelationshipModel.findOneAndUpdate(
+        { follower: follower._id, followee: followee._id },
+        {},
+        { upsert: true, new: true }
+      );
+      if (updatedRelationship) {
+        return res.status(201).json();
+      }
+      return res.status(204).json();
+    } catch (error) {
+      console.log(error.message);
+      return res.status(500).json({
+        error: 'Failed to follow User',
+      });
+    }
+  },
   unfollowUser: async (req, res) => {},
+
   deleteAccount: async (req, res) => {},
+
+  activateAccount: async (req, res) => {
+    const { token } = req.params;
+    const verified = jwt.verify(token, process.env.JWT_SECRET_ACTIVATE);
+
+    if (!verified) {
+      return res.status(401).json({
+        error: 'Activation link expired',
+      });
+    }
+
+    try {
+      const user = await UserModel.create(verified.data);
+      return res.json({ user });
+    } catch (error) {
+      return res.status(401).json({
+        error: 'Failed to activate user account',
+      });
+    }
+  },
 };
 module.exports = controller;
