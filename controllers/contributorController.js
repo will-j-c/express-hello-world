@@ -165,7 +165,7 @@ const controller = {
         data,
         { new: true }
       );
-      return res.status(200).json(updatedContributor);
+      return res.json(updatedContributor);
     } catch (error) {
       console.log(error);
       return res.status(500).json({
