@@ -44,10 +44,13 @@ const userAuth = {
 
     switch (route) {
       case 'comments':
-        commentsAuth();
+        await commentsAuth();
         break;
       case 'contributors':
-        contributorsAuth();
+        await contributorsAuth();
+        break;
+      case 'projects':
+        await projectsAuth();
         break;
       default:
         return next();
@@ -58,9 +61,29 @@ const userAuth = {
       if (comment.user_id.toString() === user._id.toString()) {
         return next();
       }
-      return res.status(403).json();
+      return res
+        .status(403)
+        .json({ error: 'User is not authorized to change Comments details for this project' });
     }
 
+    async function projectsAuth() {
+      // If it's a request to unfollow a project
+      if (req.params.username) {
+        if (req.params.username === req.authUser.username) {
+          return next();
+        }
+        return res.status(403).json({
+          error: 'User is not authorized to change Project details for this project',
+        });
+      }
+      const project = await ProjectModel.findOne({ slug: req.params.slug }, { user_id: 1, _id: 0 });
+      if (project.user_id.toString() === user._id.toString()) {
+        return next();
+      }
+      return res.status(403).json({
+        error: 'User is not authorized to change Project details for this project',
+      });
+    }
     async function contributorsAuth() {
       let projectFilter = null;
       const contributor = await ContributorModel.findOne({ _id: req.params.id });
