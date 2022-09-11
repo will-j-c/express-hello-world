@@ -74,11 +74,20 @@ const controller = {
   },
 
   add: async (req, res) => {
-    const { project_slug, title, skills, is_remote, description, commitmentLevel, available_slots } = req.body;
-    let validatedResults = null;
+    const { 
+      project_slug,
+      title,
+      skills,
+      is_remote,
+      description,
+      commitmentLevel,
+      available_slots,
+      remuneration,
+      city
+    } = req.body;
 
     try {
-      validatedResults = await validator.add.validateAsync({
+      await validator.add.validateAsync({
         title,
         skills,
         is_remote,
@@ -128,7 +137,9 @@ const controller = {
         is_remote,
         description,
         commitmentLevel,
-        available_slots
+        available_slots,
+        city,
+        remuneration,
       });
 
       return res.status(201).json(newContributor);
