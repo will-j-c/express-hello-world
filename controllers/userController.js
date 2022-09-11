@@ -38,29 +38,67 @@ const controller = {
       }
       const hostedProjects = await ProjectModel.find(
         { user_id: profileOwner._id },
-        { __v: 0, _id: 0 }
+        { __v: 0, _id: 0, user_id: 0 }
       ).lean();
       const hostedPublicProjects = await ProjectModel.aggregate([
         { $match: { state: 'published', user_id: profileOwner._id } },
         { $sort: { updatedAt: -1 } },
-        { $project: { __v: 0, user_id: 0 } },
+        { $project: { __v: 0, user_id: 0, _id: 0 } },
       ]);
       // show ContributedProject with status : accecpted
       const contributedJobs = await ContributorRelationshipModel.find(
         {
           user_id: profileOwner._id,
-          // state: 'accepted',
+          state: 'accepted',
         },
-        { contributor_id: 1 }
-      ).populate({
-        path: 'contributor_id',
-        select: 'project_id',
-        populate: { path: 'project_id', select: '-__v -user_id -_id' },
-      });
-      let contributedProjects = [];
+        { contributor_id: 1, _id: 0 }
+      )
+        .populate({
+          path: 'contributor_id',
+          select: 'project_id -_id',
+          populate: { path: 'project_id', select: '-__v -user_id -_id' },
+        })
+        .lean();
+      const appliedJobs = await ContributorRelationshipModel.find(
+        {
+          user_id: profileOwner._id,
+          state: 'applied',
+        },
+        { contributor_id: 1, _id: 0 }
+      )
+        .populate({
+          path: 'contributor_id',
+          select: 'project_id -_id',
+          populate: { path: 'project_id', select: '-__v -user_id -_id' },
+        })
+        .lean();
+      const contributedProjects = [];
+      for (let i = 0, len = contributedJobs.length; i < len; i++) {
+        contributedProjects[i] = contributedJobs[i]?.contributor_id?.project_id;
+      }
+      const appliedProjects = [];
+      for (let i = 0, len = contributedJobs.length; i < len; i++) {
+        appliedProjects[i] = appliedJobs[i]?.contributor_id?.project_id;
+      }
+      const followingProjectsRelationship = await ProjectsRelationshipModel.find(
+        { user_id: profileOwner._id, state: 'published' },
+        { project_id: 1, _id: 0 }
+      )
+        .lean()
+        .populate({ path: 'project_id', select: '-__v -_id -user_id' });
+      const followingProjects = [];
+      for (let i = 0, len = followingProjectsRelationship.length; i < len; i++) {
+        followingProjects[i] = followingProjectsRelationship[i]?.project_id;
+      }
 
-      // return res.json({ profileOwner, hostedProjects, hostedPublicProjects, contributedJobs });
-      return res.json({ contributedJobs });
+      return res.json({
+        profileOwner,
+        hostedProjects,
+        hostedPublicProjects,
+        contributedProjects,
+        appliedProjects,
+        followingProjects,
+      });
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch user by username from database',
