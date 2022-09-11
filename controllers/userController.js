@@ -5,6 +5,7 @@ const UsersRelationshipModel = require('../models/usersRelationship');
 const ProjectsRelationshipModel = require('../models/projectsRelationship');
 const ContributorRelationshipModel = require('../models/contributorsRelationship');
 const ContributorModel = require('../models/contributorModel');
+const CommentModel = require('../models/commentModel');
 const validator = require('../validations/userValidation');
 const validSkills = require('../seeds/predefined-data/skills.json');
 const { profile } = require('../validations/userValidation');
@@ -197,13 +198,16 @@ const controller = {
       const hostProjects = await ProjectModel.find({ user_id: profileOwner?._id }, { _id: 1 });
       if (hostProjects.length) {
         for (let i = 0, len = hostProjects.length; i < len; i += 1) {
-          await ContributorModel.deleteMany({ project_id: hostProjects[i]?._id });
+          await ContributorModel.deleteMany({ project_id: hostProjects[i]._id });
         }
-        hostProjects.deleteMany();
+        await ProjectModel.deleteMany({ user_id: profileOwner?._id });
       }
-      // await ContributorRelationshipModel.deleteMany({ user_id: profileOwner?._id });
-      // await ProjectsRelationshipModel.deleteMany({ user_id: profileOwner._id });
-      // await ProjectsRelationshipModel.deleteMany({ user_id: profileOwner._id });
+      await UsersRelationshipModel.deleteMany({
+        $or: [{ follower: profileOwner?._id }, { followee: profileOwner?._id }],
+      });
+      await ContributorRelationshipModel.deleteMany({ user_id: profileOwner?._id });
+      await ProjectsRelationshipModel.deleteMany({ user_id: profileOwner?._id });
+      await CommentModel.deleteMany({ user_id: profileOwner?._id });
 
       profileOwner?.deleteOne();
 
