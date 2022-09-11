@@ -49,15 +49,18 @@ const controller = {
       const contributedJobs = await ContributorRelationshipModel.find(
         {
           user_id: profileOwner._id,
-          state: 'accepted',
+          // state: 'accepted',
         },
         { contributor_id: 1 }
-      )
-        .populate('contributor_id')
-        .populate('project_id');
+      ).populate({
+        path: 'contributor_id',
+        select: 'project_id',
+        populate: { path: 'project_id', select: '-__v -user_id -_id' },
+      });
       let contributedProjects = [];
 
-      return res.json({ profileOwner, hostedProjects, hostedPublicProjects, contributedJobs });
+      // return res.json({ profileOwner, hostedProjects, hostedPublicProjects, contributedJobs });
+      return res.json({ contributedJobs });
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch user by username from database',
