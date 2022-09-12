@@ -37,6 +37,7 @@ const controller = {
     // console.log(req.files);
     if (req.files) {
       const projectPhotoUploaded = req.files;
+      console.log(req.files);
       for (let field in projectPhotoUploaded) {
         const result = await imageKit.upload({
           file: projectPhotoUploaded[field][0].buffer,
