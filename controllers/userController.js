@@ -9,6 +9,13 @@ const CommentModel = require('../models/commentModel');
 const validator = require('../validations/userValidation');
 const validSkills = require('../seeds/predefined-data/skills.json');
 const { profile } = require('../validations/userValidation');
+const ImageKit = require('imagekit');
+
+const imageKit = new ImageKit({
+  publicKey: 'public_QbELL12FWyFW2r8fpAWMLY2t6j0=',
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+  urlEndpoint: 'https://ik.imagekit.io/wu6yrdrjf/',
+});
 
 const controller = {
   showAllUsers: async (req, res) => {
@@ -106,6 +113,21 @@ const controller = {
   },
   editProfile: async (req, res) => {
     const { name, tagline, skills, interests, linkedin, github, twitter, facebook } = req.body;
+    const file = req.file;
+
+    if (file) {
+      try {
+        const result = await imageKit.upload({
+          file: file.buffer,
+          fileName: `${req.authUser.username}-Date.now()`,
+          folder: `helloworld/user-avatar`,
+        });
+        req.body[`profile_pic_url`] = result.url || 'logo helloworld.img';
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+    const profile_pic_url = req.body['profile_pic_url'];
     const socmedFormat = {
       facebook: req.body.facebook,
       linkedin: req.body.linkedin,
@@ -122,9 +144,10 @@ const controller = {
         skills,
         interests,
         socmed,
+        profile_pic_url,
       });
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
       return res.status(400).json({
         error: 'Invalid input',
       });
@@ -139,18 +162,19 @@ const controller = {
         });
       }
       const skillsArr = skills
-        .split(',')
+        ?.split(',')
         .map((item) => item.trim())
         .filter((item) => validSkills.includes(item));
-      const interestsArr = interests.split(',').map((item) => item.trim());
+      const interestsArr = interests?.split(',').map((item) => item.trim());
 
       await UserModel.findOneAndUpdate(
         { username: req.params.username },
-        { name, tagline, skillsArr, interestsArr, socmed }
+        { name, tagline, skillsArr, interestsArr, socmed, profile_pic_url }
       );
+      console.log(profile_pic_url);
       return res.status(201).json();
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
       return res.status(500).json({
         error: 'Failed to edit profile',
       });
