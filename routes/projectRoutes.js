@@ -1,6 +1,8 @@
 const express = require('express');
 const projectController = require('../controllers/projectController');
 const authMiddleware = require('../middlewares/userAuth');
+const multer = require('multer');
+const upload = multer();
 
 const router = express.Router();
 
@@ -20,6 +22,10 @@ router.put(
   '/:slug',
   authMiddleware.isAuthenticated,
   authMiddleware.isAuthorized,
+  upload.fields([
+    { name: 'project_logo_url', maxCount: 1 },
+    { name: 'project_image_urls', maxCount: 10 },
+  ]),
   projectController.editProject
 );
 router.delete(
@@ -29,6 +35,14 @@ router.delete(
   projectController.deleteProject
 );
 router.get('/', projectController.showAllProjects);
-router.post('/', authMiddleware.isAuthenticated, projectController.createProject);
+router.post(
+  '/',
+  authMiddleware.isAuthenticated,
+  upload.fields([
+    { name: 'project_logo_url', maxCount: 1 },
+    { name: 'project_image_urls', maxCount: 10 },
+  ]),
+  projectController.createProject
+);
 
 module.exports = router;
