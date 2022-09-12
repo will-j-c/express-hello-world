@@ -38,6 +38,6 @@ const contributorSchema = new mongoose.Schema({
   },
 });
 
-const contributorModel = mongoose.model('contributor', contributorSchema);
+const contributorModel = mongoose.model('Contributor', contributorSchema);
 
 module.exports = contributorModel;
