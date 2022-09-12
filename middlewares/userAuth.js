@@ -84,6 +84,7 @@ const userAuth = {
         error: 'User is not authorized to change Project details for this project',
       });
     }
+    
     async function contributorsAuth() {
       let projectFilter = null;
       const contributor = await ContributorModel.findOne({ _id: req.params.id });
