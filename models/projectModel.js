@@ -6,7 +6,8 @@ mongoose.plugin(slug);
 const projectSchema = new mongoose.Schema(
   {
     user_id: {
-      type: String,
+      type: mongoose.ObjectId,
+      ref: 'User',
       required: true,
     },
     title: {
@@ -15,7 +16,6 @@ const projectSchema = new mongoose.Schema(
     },
     slug: {
       type: String,
-      required: true,
       unique: true,
       slug: 'title',
     },
@@ -30,9 +30,6 @@ const projectSchema = new mongoose.Schema(
     },
     state: {
       type: String,
-    },
-    roles: {
-      type: Array,
     },
     description: {
       type: String,

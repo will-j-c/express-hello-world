@@ -1,8 +1,13 @@
 const mongoose = require('mongoose');
 
-const RoleSchema = new mongoose.Schema({
+const contributorSchema = new mongoose.Schema({
   title: {
     type: String,
+    required: true,
+  },
+  project_id: {
+    type: mongoose.ObjectId,
+    ref: 'Project',
     required: true,
   },
   skills: {
@@ -20,7 +25,7 @@ const RoleSchema = new mongoose.Schema({
   city: {
     type: String,
   },
-  commitmentLevel: {
+  commitment_level: {
     type: String,
     required: true,
   },
@@ -33,6 +38,6 @@ const RoleSchema = new mongoose.Schema({
   },
 });
 
-const RoleModel = mongoose.model('Role', RoleSchema);
+const contributorModel = mongoose.model('contributor', contributorSchema);
 
-module.exports = RoleModel;
+module.exports = contributorModel;
