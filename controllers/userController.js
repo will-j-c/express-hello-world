@@ -9,6 +9,13 @@ const CommentModel = require('../models/commentModel');
 const validator = require('../validations/userValidation');
 const validSkills = require('../seeds/predefined-data/skills.json');
 const { profile } = require('../validations/userValidation');
+const ImageKit = require('imagekit');
+
+const imageKit = new ImageKit({
+  publicKey: 'public_QbELL12FWyFW2r8fpAWMLY2t6j0=',
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+  urlEndpoint: 'https://ik.imagekit.io/wu6yrdrjf/',
+});
 
 const controller = {
   showAllUsers: async (req, res) => {
@@ -48,6 +55,7 @@ const controller = {
   },
   editProfile: async (req, res) => {
     const { name, tagline, skills, interests, linkedin, github, twitter, facebook } = req.body;
+    console.log(profile_pic_url);
     const socmedFormat = {
       facebook: req.body.facebook,
       linkedin: req.body.linkedin,
