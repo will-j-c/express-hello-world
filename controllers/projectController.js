@@ -6,6 +6,13 @@ const ContributorModel = require('../models/contributorModel');
 const ContributorRelationshipsModel = require('../models/contributorsRelationship');
 const ProjectsRelationshipModel = require('../models/projectsRelationship');
 const projectValidationSchema = require('../validations/projectValidation');
+const ImageKit = require('imagekit');
+
+const imageKit = new ImageKit({
+  publicKey: 'public_QbELL12FWyFW2r8fpAWMLY2t6j0=',
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+  urlEndpoint: 'https://ik.imagekit.io/wu6yrdrjf/',
+});
 
 const controller = {
   showAllProjects: async (req, res) => {
@@ -25,6 +32,22 @@ const controller = {
     return res.json(projects);
   },
   createProject: async (req, res) => {
+    //get URL after user upload images for logo and project-photos:
+    const projectPhotoUrls = {};
+    // console.log(req.files);
+    if (req.files) {
+      const projectPhotoUploaded = req.files;
+      console.log(req.files);
+      // for (let field in req.files) {
+      //   const result = await imageKit.upload({
+      //     file: photoObj[field][0].buffer,
+      //     fileName: photoObj[field][0].originalname,
+      //     folder: field,
+      //   });
+      //   photoUrl[field] = result.url;
+      // }
+    }
+
     // Validations
     let validatedResults = null;
     try {
