@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
     type: String,
   },
   socmed: {
-    type: Array,
+    type: Object,
   },
 });
 
