@@ -55,7 +55,21 @@ const controller = {
   },
   editProfile: async (req, res) => {
     const { name, tagline, skills, interests, linkedin, github, twitter, facebook } = req.body;
-    console.log(profile_pic_url);
+    const file = req.file;
+
+    if (file) {
+      try {
+        const result = await imageKit.upload({
+          file: file.buffer,
+          fileName: `${req.authUser.username}-Date.now()`,
+          folder: `helloworld/user-avatar`,
+        });
+        req.body[`profile_pic_url`] = result.url || 'logo helloworld.img';
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+    const profile_pic_url = req.body['profile_pic_url'];
     const socmedFormat = {
       facebook: req.body.facebook,
       linkedin: req.body.linkedin,
@@ -72,6 +86,7 @@ const controller = {
         skills,
         interests,
         socmed,
+        profile_pic_url,
       });
     } catch (error) {
       console.log(error.message);
@@ -96,7 +111,7 @@ const controller = {
 
       await UserModel.findOneAndUpdate(
         { username: req.params.username },
-        { name, tagline, skillsArr, interestsArr, socmed }
+        { name, tagline, skillsArr, interestsArr, socmed, profile_pic_url }
       );
       return res.status(201).json();
     } catch (error) {
