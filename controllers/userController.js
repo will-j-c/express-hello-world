@@ -89,7 +89,7 @@ const controller = {
         profile_pic_url,
       });
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
       return res.status(400).json({
         error: 'Invalid input',
       });
@@ -104,18 +104,19 @@ const controller = {
         });
       }
       const skillsArr = skills
-        .split(',')
+        ?.split(',')
         .map((item) => item.trim())
         .filter((item) => validSkills.includes(item));
-      const interestsArr = interests.split(',').map((item) => item.trim());
+      const interestsArr = interests?.split(',').map((item) => item.trim());
 
       await UserModel.findOneAndUpdate(
         { username: req.params.username },
         { name, tagline, skillsArr, interestsArr, socmed, profile_pic_url }
       );
+      console.log(profile_pic_url);
       return res.status(201).json();
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
       return res.status(500).json({
         error: 'Failed to edit profile',
       });
