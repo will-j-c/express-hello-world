@@ -37,16 +37,21 @@ const controller = {
     // console.log(req.files);
     if (req.files) {
       const projectPhotoUploaded = req.files;
-      console.log(req.files);
-      // for (let field in req.files) {
-      //   const result = await imageKit.upload({
-      //     file: photoObj[field][0].buffer,
-      //     fileName: photoObj[field][0].originalname,
-      //     folder: field,
-      //   });
-      //   photoUrl[field] = result.url;
-      // }
+      for (let field in projectPhotoUploaded) {
+        const result = await imageKit.upload({
+          file: projectPhotoUploaded[field][0].buffer,
+          fileName: `${req.body.slug}-${Date.now()}`,
+          folder: `helloworld/${field}`,
+        });
+        projectPhotoUrls[field] = result.url;
+      }
     }
+    console.log(projectPhotoUrls);
+    req.body.logo_url = projectPhotoUrls['project_logo_url'];
+    // req.body.image_urls = projectPhotoUrls['project_image_urls'];
+    //define projectOwner
+    const projectOwner = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
+    req.body.user_id = projectOwner?._id.toString();
 
     // Validations
     let validatedResults = null;

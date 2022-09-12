@@ -39,7 +39,6 @@ const userAuth = {
 
   isAuthorized: async (req, res, next) => {
     const route = req.baseUrl.split('/').pop();
-
     const user = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
 
     switch (route) {
@@ -77,14 +76,14 @@ const userAuth = {
         });
       }
       const project = await ProjectModel.findOne({ slug: req.params.slug }, { user_id: 1, _id: 0 });
-      if (project.user_id.toString() === user._id.toString()) {
+      if (project?.user_id.toString() === user?._id.toString()) {
         return next();
       }
       return res.status(403).json({
         error: 'User is not authorized to change Project details for this project',
       });
     }
-    
+
     async function contributorsAuth() {
       let projectFilter = null;
       const contributor = await ContributorModel.findOne({ _id: req.params.id });
