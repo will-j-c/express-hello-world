@@ -11,12 +11,12 @@ const validSkills = require('../seeds/predefined-data/skills.json');
 const getData = async (req) => {
   const user = await UserModel.findOne({ username: req.authUser.username });
   const contributor = await ContributorModel.findOne({ _id: req.params.id });
-  const relation = await RelationshipModel.findOne({ 
+  const relation = await RelationshipModel.findOne({
     user_id: user._id,
     contributor_id: contributor._id,
   });
 
-  return [user?._id, contributor?._id, relation]
+  return [user?._id, contributor?._id, relation];
 };
 
 const controller = {
@@ -190,7 +190,7 @@ const controller = {
 
   addApplicant: async (req, res) => {
     try {
-      const [user_id, contributor_id,] = await getData(req);
+      const [user_id, contributor_id] = await getData(req);
 
       const relation = await RelationshipModel.findOneAndUpdate(
         {
@@ -218,7 +218,7 @@ const controller = {
       await relation.deleteOne();
       return res.json({
         message: `successfully delete ${relation._id}`,
-      })
+      });
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to delete',
@@ -226,13 +226,13 @@ const controller = {
     }
   },
 
-  acceptApplicant: async (req, res) => {
+  addApplicant: async (req, res) => {},
 
-  },
+  removeApplicant: async (req, res) => {},
 
-  rejectApplicant: async (req, res) => {
+  acceptApplicant: async (req, res) => {},
 
-  },
-}
+  rejectApplicant: async (req, res) => {},
+};
 
 module.exports = controller;
