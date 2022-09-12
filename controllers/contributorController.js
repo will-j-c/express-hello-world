@@ -8,6 +8,17 @@ const UserModel = require('../models/userModel');
 const validator = require('../validations/contributorValidation');
 const validSkills = require('../seeds/predefined-data/skills.json');
 
+const getData = async (req) => {
+  const user = await UserModel.findOne({ username: req.authUser.username });
+  const contributor = await ContributorModel.findOne({ _id: req.params.id });
+  const relation = await RelationshipModel.findOne({
+    user_id: user._id,
+    contributor_id: contributor._id,
+  });
+
+  return [user?._id, contributor?._id, relation];
+};
+
 const controller = {
   showAll: async (req, res) => {
     // not sure but may need to apply filters based on req.query in future
@@ -154,7 +165,7 @@ const controller = {
         data,
         { new: true }
       );
-      return res.status(200).json(updatedContributor);
+      return res.json(updatedContributor);
     } catch (error) {
       console.log(error);
       return res.status(500).json({
@@ -177,9 +188,43 @@ const controller = {
     }
   },
 
-  update: async (req, res) => {},
+  addApplicant: async (req, res) => {
+    try {
+      const [user_id, contributor_id] = await getData(req);
 
-  delete: async (req, res) => {},
+      const relation = await RelationshipModel.findOneAndUpdate(
+        {
+          user_id,
+          contributor_id,
+        },
+        { state: 'applied' },
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+
+      return res.json(relation);
+    } catch (error) {
+      return res.status(500).json({
+        error: 'Failed to apply',
+      });
+    }
+  },
+
+  removeApplicant: async (req, res) => {
+    try {
+      const [, , relation] = await getData(req);
+      await relation.deleteOne();
+      return res.json({
+        message: `successfully delete ${relation._id}`,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        error: 'Failed to delete',
+      });
+    }
+  },
 
   addApplicant: async (req, res) => {},
 
