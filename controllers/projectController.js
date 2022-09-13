@@ -13,6 +13,36 @@ const imageKit = new ImageKit({
   privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
   urlEndpoint: 'https://ik.imagekit.io/wu6yrdrjf/',
 });
+const getLogoUrl = async (photoUploaded, fileName) => {
+  try {
+    const logo_from_multer = photoUploaded.logo_url[0];
+    const logo_from_imageKit = await imageKit.upload({
+      file: logo_from_multer.buffer,
+      fileName: `${fileName}-logo_url-${Date.now()}`,
+      folder: `helloworld/logo_url`,
+    });
+    return logo_from_imageKit.url;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getProjectImageUrls = async (photosUploadedArr, fileName) => {
+  try {
+    let photosImageKit = [];
+    for (let i = 0, len = photosUploadedArr.length; i < len; i++) {
+      const project_image = await imageKit.upload({
+        file: photosUploadedArr[i].buffer,
+        fileName: `${fileName}-image_urls-${Date.now()}`,
+        folder: `helloworld/image_urls`,
+      });
+      photosImageKit[i] = project_image.url;
+    }
+    return photosImageKit;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const controller = {
   showAllProjects: async (req, res) => {
@@ -32,39 +62,24 @@ const controller = {
     return res.json(projects);
   },
   createProject: async (req, res) => {
-    console.log(req.file);
-    const projectPhotoUrls = {};
-    const uploadedLogo = req.file;
-    console.log(uploadedLogo);
-    if (uploadedLogo) {
+    if (req.files) {
       try {
-        const result = await imageKit.upload({
-          file: file.buffer,
-          fileName: `logo-${req.body.slug}-${Date.now()}`,
-          folder: `helloworld/project-logo`,
-        });
-        req.body.logo_url =
-          result.url || 'https://i.pinimg.com/564x/59/ba/29/59ba296266c7ac7278f8c770c3508a27.jpg';
+        req.body.logo_url = await getLogoUrl(req.files, req.body.slug);
       } catch (error) {
-        console.log(error.message);
-        res.status(501).json({
-          error: 'Failed to upload photos',
+        console.log(error);
+        return res.status(401).json({
+          error: 'Failed to upload project logo',
+        });
+      }
+      try {
+        req.body.image_urls = await getProjectImageUrls(req.files.image_urls, req.body.slug);
+      } catch (error) {
+        console.log(error);
+        return res.status(401).json({
+          error: 'Failed to upload project Images',
         });
       }
     }
-    // const uploadedProjectImage = req.files;
-    // console.log(req.file);
-    if (1 === 3) {
-      for (let field in projectPhotoUploaded) {
-        const result = await imageKit.upload({
-          file: projectPhotoUploaded[field][0].buffer,
-          fileName: `${req.body.slug}-${Date.now()}`,
-          folder: `helloworld/${field}`,
-        });
-        projectPhotoUrls[field] = result.url;
-      }
-    }
-
     //define projectOwner
     const projectOwner = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
     req.body.user_id = projectOwner?._id.toString();

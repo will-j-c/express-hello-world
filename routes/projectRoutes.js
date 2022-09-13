@@ -34,8 +34,10 @@ router.get('/', projectController.showAllProjects);
 router.post(
   '/',
   authMiddleware.isAuthenticated,
-  upload.single('project_logo_url'),
-  upload.array('project_image_urls', 12),
+  upload.fields([
+    { name: 'logo_url', maxCount: 1 },
+    { name: 'image_urls', maxCount: 4 },
+  ]),
   projectController.createProject
 );
 
