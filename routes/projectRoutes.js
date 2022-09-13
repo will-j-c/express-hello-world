@@ -1,10 +1,21 @@
 const express = require('express');
+const multer = require('multer');
 const projectController = require('../controllers/projectController');
 const authMiddleware = require('../middlewares/userAuth');
-const multer = require('multer');
+
 const upload = multer();
 
 const router = express.Router();
+
+const contributorController = require('../controllers/contributorController');
+
+// for contributor add route
+router.post(
+  '/:slug/contributors',
+  authMiddleware.isAuthenticated,
+  authMiddleware.isAuthorized,
+  contributorController.add
+);
 
 router.post(
   '/:slug/follow/:username',

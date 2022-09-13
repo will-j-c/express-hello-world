@@ -9,31 +9,41 @@ const validator = require('../validations/contributorValidation');
 const validSkills = require('../seeds/predefined-data/skills.json');
 
 const getData = async (req) => {
-  let user = await UserModel.findOne({ username: req.authUser.username });
-  if (req.params.username) {
-    user = await UserModel.findOne({ username: req.params.username });
-  }
-  const contributor = await ContributorModel.findOne({ _id: req.params.id });
-  const project = await ProjectModel.findOne({ _id: contributor.project_id });
-  const relation = await RelationshipModel.findOne({ 
-    user_id: user._id,
-    contributor_id: contributor._id,
-  });
+  try {
+    let user = await UserModel.findOne({ username: req.authUser.username });
+    if (req.params.username) {
+      user = await UserModel.findOne({ username: req.params.username });
+    }
+    const contributor = await ContributorModel.findOne({ _id: req.params.id });
+    const project = await ProjectModel.findOne({ _id: contributor?.project_id });
+      const relation = await RelationshipModel.findOne({ 
+      user_id: user._id,
+      contributor_id: contributor._id,
+    });
 
-  return [user?._id, contributor?._id, project?.user_id, relation];
+    return {
+      user_id: user?._id,
+      contributor_id: contributor?._id,
+      projectOwnerId: project?.user_id,
+      relation,
+    }
+  } catch (err) {
+    return json.status(500).json({
+      error: 'Failed to fetch data',
+    })
+  }
 };
 
 const controller = {
-  showAll: async (req, res) => {
-    // not sure but may need to apply filters based on req.query in future
-    const filters = {};
-    let contributors = [];
-    let projects = [];
+  index: async (req, res) => {
     try {
+      // not sure but may need to apply filters based on req.query in future
+      const filters = {};
+      let projects = [];
       // note: unsure the implementation on FE
       // hence currently returning all data (in case need for filtering, etc)
       // can add $projects later on once FE implemnentation is confirmed
-      contributors = await ContributorModel.aggregate([
+      const contributors = await ContributorModel.aggregate([
         { $match: filters },
         { $sort: { updatedAt: -1 } },
       ]);
@@ -61,39 +71,38 @@ const controller = {
       );
 
       // for consideration later: do we also want to pull contributorRelationships
+
+      return res.json({ contributors, projects });
+
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch data',
       });
     }
-    return res.json({ contributors, projects });
   },
 
-  showOne: async (req, res) => {
-    let contributor = null;
-    let project = null;
-    let relations = [];
-    const { id } = req.params;
+  show: async (req, res) => {
     try {
-      contributor = await ContributorModel.findOne({ _id: id });
-      project = await ProjectModel.findOne(
+      const { id } = req.params;
+      const contributor = await ContributorModel.findOne({ _id: id });
+      const project = await ProjectModel.findOne(
         { _id: contributor.project_id },
         { _id: 0, title: 1, slug: 1, tagline: 1, logo_url: 1 }
       );
-      relations = await RelationshipModel.find({ contributor_id: id });
+      const relations = await RelationshipModel.find({ contributor_id: id });
+      return res.json({ contributor, project, relations });
     } catch (error) {
       return res.status(404).json({
         error: 'Resource cannot be found',
       });
     }
-    return res.json({ contributor, project, relations });
   },
 
   add: async (req, res) => {
-    const data = { ...req.body };
-    delete data.project_slug;
+    let data = null;
+    
     try {
-      await validator.details.validateAsync(data);
+      data = await validator.details.validateAsync(req.body);
     } catch (error) {
       console.log(error);
       return res.status(400).json({
@@ -104,9 +113,12 @@ const controller = {
     try {
       const { skills, title } = data;
 
+      // get project
+      const project = await ProjectModel.findOne({ slug: req.params.slug }, '_id');
+
       // check if there exists a contributor with the same name in database
       const existingContributor = await ContributorModel.findOne({
-        project_id: req.projectID,
+        project_id: project._id,
         title,
       });
 
@@ -122,7 +134,7 @@ const controller = {
         .filter((item) => validSkills.includes(item));
 
       data.skills = skillsArr;
-      data.project_id = req.projectID;
+      data.project_id = project._id;
 
       const newContributor = await ContributorModel.create(data);
 
@@ -194,7 +206,7 @@ const controller = {
 
   addApplicant: async (req, res) => {
     try {
-      const [user_id, contributor_id, projectOwner_id, relation] = await getData(req);
+      const { user_id, contributor_id, projectOwnerId, relation } = await getData(req);
 
       if (relation) {
         return res.status(409).json({
@@ -202,7 +214,7 @@ const controller = {
         })
       }
 
-      if (user_id.toString() === projectOwner_id.toString()) {
+      if (user_id.toString() === projectOwnerId.toString()) {
         return res.status(409).json({
           error: 'Project owner cannot apply to be a contributor',
         })
@@ -224,7 +236,7 @@ const controller = {
 
   removeApplicant: async (req, res) => {
     try {
-      const [, , , relation] = await getData(req);
+      const { relation }= await getData(req);
       await relation.deleteOne();
       return res.json({
         message: `successfully delete ${relation._id}`,
@@ -238,7 +250,7 @@ const controller = {
 
   acceptApplicant: async (req, res) => {
     try {
-      const [, , relation] = await getData(req);
+      const { relation }= await getData(req);
       await relation.updateOne({ state: 'accepted' });
       return res.json({
         message: `Updated relationship ${relation._id} state to accepted`,
@@ -253,7 +265,7 @@ const controller = {
 
   rejectApplicant: async (req, res) => {
     try {
-      const [, , relation] = await getData(req);
+      const { relation }= await getData(req);
       await relation.updateOne({ state: 'rejected' });
       return res.json({
         message: `Updated relationship ${relation._id} state to rejected`,
