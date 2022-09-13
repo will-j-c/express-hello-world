@@ -9,14 +9,18 @@ const validator = require('../validations/contributorValidation');
 const validSkills = require('../seeds/predefined-data/skills.json');
 
 const getData = async (req) => {
-  const user = await UserModel.findOne({ username: req.authUser.username });
+  let user = await UserModel.findOne({ username: req.authUser.username });
+  if (req.params.username) {
+    user = await UserModel.findOne({ username: req.params.username });
+  }
   const contributor = await ContributorModel.findOne({ _id: req.params.id });
-  const relation = await RelationshipModel.findOne({
+  const project = await ProjectModel.findOne({ _id: contributor.project_id });
+  const relation = await RelationshipModel.findOne({ 
     user_id: user._id,
     contributor_id: contributor._id,
   });
 
-  return [user?._id, contributor?._id, relation];
+  return [user?._id, contributor?._id, project?.user_id, relation];
 };
 
 const controller = {
@@ -190,22 +194,28 @@ const controller = {
 
   addApplicant: async (req, res) => {
     try {
-      const [user_id, contributor_id] = await getData(req);
+      const [user_id, contributor_id, projectOwner_id, relation] = await getData(req);
 
-      const relation = await RelationshipModel.findOneAndUpdate(
-        {
-          user_id,
-          contributor_id,
-        },
-        { state: 'applied' },
-        {
-          new: true,
-          upsert: true,
-        }
-      );
+      if (relation) {
+        return res.status(409).json({
+          error: 'User has already applied previously',
+        })
+      }
 
-      return res.json(relation);
+      if (user_id.toString() === projectOwner_id.toString()) {
+        return res.status(409).json({
+          error: 'Project owner cannot apply to be a contributor',
+        })
+      }
+      const newRelation = await RelationshipModel.create({
+        user_id,
+        contributor_id,
+        state: 'applied'
+      });
+      return res.json(newRelation);
+
     } catch (error) {
+      console.log(error);
       return res.status(500).json({
         error: 'Failed to apply',
       });
@@ -214,7 +224,7 @@ const controller = {
 
   removeApplicant: async (req, res) => {
     try {
-      const [, , relation] = await getData(req);
+      const [, , , relation] = await getData(req);
       await relation.deleteOne();
       return res.json({
         message: `successfully delete ${relation._id}`,
@@ -226,13 +236,35 @@ const controller = {
     }
   },
 
-  addApplicant: async (req, res) => {},
+  acceptApplicant: async (req, res) => {
+    try {
+      const [, , relation] = await getData(req);
+      await relation.updateOne({ state: 'accepted' });
+      return res.json({
+        message: `Updated relationship ${relation._id} state to accepted`,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: 'Failed to update contributor status',
+      });
+    }
+  },
 
-  removeApplicant: async (req, res) => {},
-
-  acceptApplicant: async (req, res) => {},
-
-  rejectApplicant: async (req, res) => {},
+  rejectApplicant: async (req, res) => {
+    try {
+      const [, , relation] = await getData(req);
+      await relation.updateOne({ state: 'rejected' });
+      return res.json({
+        message: `Updated relationship ${relation._id} state to rejected`,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: 'Failed to update contributor status',
+      });
+    }
+  },
 };
 
 module.exports = controller;
