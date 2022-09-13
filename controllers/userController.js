@@ -212,7 +212,6 @@ const controller = {
         error: 'User is not authorised to change this profile',
       });
     }
-
     const { name, tagline, skills, interests, linkedin, github, twitter, facebook } = req.body;
     const file = req.file;
 
@@ -223,7 +222,8 @@ const controller = {
           fileName: `${req.authUser.username}-Date.now()`,
           folder: `helloworld/user-avatar`,
         });
-        req.body[`profile_pic_url`] = result.url || 'logo helloworld.img';
+        req.body[`profile_pic_url`] =
+          result.url || 'https://i.pinimg.com/564x/a9/d6/7e/a9d67e7c7c1f738141b3d728c31b2dd8.jpg';
       } catch (error) {
         console.log(error);
         return res.status(401).json({
@@ -257,15 +257,16 @@ const controller = {
       });
     }
     try {
-      const skillsArr = skills
-        ?.split(',')
-        .map((item) => item.trim())
-        .filter((item) => validSkills.includes(item));
-      const interestsArr = interests?.split(',').map((item) => item.trim());
+      // const skillsArr = skills
+      //   ?.split(',')
+      //   .map((item) => item.trim())
+      //   .filter((item) => validSkills.includes(item));
+
+      // const interestsArr = interests?.split(',').map((item) => item.trim());
 
       await UserModel.findOneAndUpdate(
         { username: req.params.username },
-        { name, tagline, skillsArr, interestsArr, socmed, profile_pic_url }
+        { name, tagline, skills, interests, socmed, profile_pic_url }
       );
       return res.status(201).json();
     } catch (error) {
