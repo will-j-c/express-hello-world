@@ -11,7 +11,8 @@ router.get('/:username/following', userController.showFollowingUsers);
 router.get('/:username/followers', userController.showFollowerUsers);
 router.post('/:username/follow', userAuth.isAuthenticated, userController.followUser);
 
-router.get('/:username/projects/public', userController.showUserProjects);
+router.get('/:username', userController.showProfile);
+router.get('/:username/projects', userController.showUserProjects);
 router.get('/:username/projects/public', userController.showUserProjectsPublic);
 router.get('/:username/projects/draft', userController.showUserProjectsDraft);
 router.get('/:username/projects/applied', userController.showUserProjectsApplied);

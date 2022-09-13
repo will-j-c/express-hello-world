@@ -19,14 +19,12 @@ const imageKit = new ImageKit({
 
 const controller = {
   showAllUsers: async (req, res) => {
-    let users = [];
     try {
-      users = await UserModel.aggregate([
+      const users = await UserModel.aggregate([
         { $match: {} },
         { $sort: { updatedAt: -1 } },
         { $project: { hash: 0 } },
       ]);
-      console.log(users);
       return res.json(users);
     } catch (error) {
       return res.status(500).json({
@@ -42,29 +40,91 @@ const controller = {
       if (!profileOwner) {
         return res.status(404).json();
       }
+
+      return res.json({
+        profileOwner,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        error: 'Failed to fetch user by username from database',
+      });
+    }
+  },
+
+  showUserProjects: async (req, res) => {
+    const username = req.params.username;
+    try {
+      const profileOwner = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
+      if (!profileOwner) {
+        return res.status(404).json();
+      }
       const hostedProjects = await ProjectModel.find(
         { user_id: profileOwner._id },
         { __v: 0, _id: 0, user_id: 0 }
       ).lean();
+      return res.json({
+        hostedProjects,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: 'Failed to fetch projects of this user from database',
+      });
+    }
+  },
+  showUserProjectsPublic: async (req, res) => {
+    const username = req.params.username;
+    try {
+      const profileOwner = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
+      if (!profileOwner) {
+        return res.status(404).json();
+      }
       const hostedPublicProjects = await ProjectModel.aggregate([
         { $match: { state: 'published', user_id: profileOwner._id } },
         { $sort: { updatedAt: -1 } },
         { $project: { __v: 0, user_id: 0, _id: 0 } },
       ]);
-      // show ContributedProject with status : accecpted
-      const contributedJobs = await ContributorRelationshipModel.find(
-        {
-          user_id: profileOwner._id,
-          state: 'accepted',
-        },
-        { contributor_id: 1, _id: 0 }
-      )
-        .populate({
-          path: 'contributor_id',
-          select: 'project_id -_id',
-          populate: { path: 'project_id', select: '-__v -user_id -_id' },
-        })
-        .lean();
+
+      return res.json({
+        hostedPublicProjects,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: 'Failed to fetch public projects of this user from database',
+      });
+    }
+  },
+  showUserProjectsDraft: async (req, res) => {
+    const username = req.params.username;
+    try {
+      const profileOwner = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
+      if (!profileOwner) {
+        return res.status(404).json();
+      }
+      const userDraftProjects = await ProjectModel.aggregate([
+        { $match: { state: 'draft', user_id: profileOwner._id } },
+        { $sort: { updatedAt: -1 } },
+        { $project: { __v: 0, user_id: 0, _id: 0 } },
+      ]);
+
+      return res.json({
+        userDraftProjects,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: 'Failed to fetch draft projects of this user from database',
+      });
+    }
+  },
+  showUserProjectsApplied: async (req, res) => {
+    const username = req.params.username;
+    try {
+      const profileOwner = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
+      if (!profileOwner) {
+        return res.status(404).json();
+      }
       const appliedJobs = await ContributorRelationshipModel.find(
         {
           user_id: profileOwner._id,
@@ -78,13 +138,62 @@ const controller = {
           populate: { path: 'project_id', select: '-__v -user_id -_id' },
         })
         .lean();
-      const contributedProjects = [];
-      for (let i = 0, len = contributedJobs.length; i < len; i++) {
-        contributedProjects[i] = contributedJobs[i]?.contributor_id?.project_id;
-      }
       const appliedProjects = [];
-      for (let i = 0, len = contributedJobs.length; i < len; i++) {
+      for (let i = 0, len = appliedJobs.length; i < len; i++) {
         appliedProjects[i] = appliedJobs[i]?.contributor_id?.project_id;
+      }
+
+      return res.json({
+        appliedProjects,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: 'Failed to fetch applied projects of this user from database',
+      });
+    }
+  },
+  showUserProjectsAccepted: async (req, res) => {
+    const username = req.params.username;
+    try {
+      const profileOwner = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
+      if (!profileOwner) {
+        return res.status(404).json();
+      }
+      const jobsAccepted = await ContributorRelationshipModel.find(
+        {
+          user_id: profileOwner._id,
+          state: 'accepted',
+        },
+        { contributor_id: 1, _id: 0 }
+      )
+        .populate({
+          path: 'contributor_id',
+          select: 'project_id -_id',
+          populate: { path: 'project_id', select: '-__v -user_id -_id' },
+        })
+        .lean();
+      const projectsAccepted = [];
+      for (let i = 0, len = jobsAccepted?.length; i < len; i++) {
+        projectsAccepted[i] = jobsAccepted[i]?.contributor_id?.project_id;
+      }
+
+      return res.json({
+        projectsAccepted,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: 'Failed to fetch contributed projects of this user from database',
+      });
+    }
+  },
+  showUserProjectsFollowing: async (req, res) => {
+    const username = req.params.username;
+    try {
+      const profileOwner = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
+      if (!profileOwner) {
+        return res.status(404).json();
       }
       const followingProjectsRelationship = await ProjectsRelationshipModel.find(
         { user_id: profileOwner._id, state: 'published' },
@@ -98,26 +207,15 @@ const controller = {
       }
 
       return res.json({
-        profileOwner,
-        hostedProjects,
-        hostedPublicProjects,
-        contributedProjects,
-        appliedProjects,
         followingProjects,
       });
     } catch (error) {
+      console.log(error);
       return res.status(500).json({
-        error: 'Failed to fetch user by username from database',
+        error: 'Failed to fetch contributed projects of this user from database',
       });
     }
   },
-
-  showUserProjects: async (req, res) => {},
-  showUserProjectsPublic: async (req, res) => {},
-  showUserProjectsDraft: async (req, res) => {},
-  showUserProjectsApplied: async (req, res) => {},
-  showUserProjectsAccepted: async (req, res) => {},
-  showUserProjectsFollowing: async (req, res) => {},
 
   editProfile: async (req, res) => {
     const { name, tagline, skills, interests, linkedin, github, twitter, facebook } = req.body;
@@ -132,7 +230,7 @@ const controller = {
         });
         req.body[`profile_pic_url`] = result.url || 'logo helloworld.img';
       } catch (error) {
-        console.log(error.message);
+        console.log(error);
       }
     }
     const profile_pic_url = req.body['profile_pic_url'];
@@ -179,7 +277,6 @@ const controller = {
         { username: req.params.username },
         { name, tagline, skillsArr, interestsArr, socmed, profile_pic_url }
       );
-      console.log(profile_pic_url);
       return res.status(201).json();
     } catch (error) {
       console.log(error);
@@ -249,7 +346,7 @@ const controller = {
       }
       return res.status(204).json();
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
       return res.status(500).json({
         error: 'Failed to follow User',
       });
@@ -274,7 +371,7 @@ const controller = {
       }
       return res.status(204).json();
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
       return res.status(500).json({
         error: 'Failed to unfollow User',
       });
