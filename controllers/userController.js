@@ -41,9 +41,7 @@ const controller = {
         return res.status(404).json();
       }
 
-      return res.json({
-        userProfile,
-      });
+      return res.json(userProfile);
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch user by username from database',
@@ -58,13 +56,11 @@ const controller = {
       if (!profileOwner) {
         return res.status(404).json();
       }
-      const hostedProjects = await ProjectModel.find(
+      const userProjects = await ProjectModel.find(
         { user_id: profileOwner._id },
         { __v: 0, _id: 0, user_id: 0 }
       ).lean();
-      return res.json({
-        hostedProjects,
-      });
+      return res.json(userProjects);
     } catch (error) {
       console.log(error);
       return res.status(500).json({
@@ -79,15 +75,13 @@ const controller = {
       if (!profileOwner) {
         return res.status(404).json();
       }
-      const hostedPublicProjects = await ProjectModel.aggregate([
+      const userProjectsPublic = await ProjectModel.aggregate([
         { $match: { state: 'published', user_id: profileOwner._id } },
         { $sort: { updatedAt: -1 } },
         { $project: { __v: 0, user_id: 0, _id: 0 } },
       ]);
 
-      return res.json({
-        hostedPublicProjects,
-      });
+      return res.json(userProjectsPublic);
     } catch (error) {
       console.log(error);
       return res.status(500).json({
@@ -102,15 +96,13 @@ const controller = {
       if (!profileOwner) {
         return res.status(404).json();
       }
-      const userDraftProjects = await ProjectModel.aggregate([
+      const userProjectsDraft = await ProjectModel.aggregate([
         { $match: { state: 'draft', user_id: profileOwner._id } },
         { $sort: { updatedAt: -1 } },
         { $project: { __v: 0, user_id: 0, _id: 0 } },
       ]);
 
-      return res.json({
-        userDraftProjects,
-      });
+      return res.json(userProjectsDraft);
     } catch (error) {
       console.log(error);
       return res.status(500).json({
@@ -138,14 +130,12 @@ const controller = {
           populate: { path: 'project_id', select: '-__v -user_id -_id' },
         })
         .lean();
-      const appliedProjects = [];
+      const userProjectApplied = [];
       for (let i = 0, len = appliedJobs.length; i < len; i++) {
-        appliedProjects[i] = appliedJobs[i]?.contributor_id?.project_id;
+        userProjectApplied[i] = appliedJobs[i]?.contributor_id?.project_id;
       }
 
-      return res.json({
-        appliedProjects,
-      });
+      return res.json(userProjectApplied);
     } catch (error) {
       console.log(error);
       return res.status(500).json({
@@ -173,14 +163,12 @@ const controller = {
           populate: { path: 'project_id', select: '-__v -user_id -_id' },
         })
         .lean();
-      const projectsAccepted = [];
+      const userProjectsAccepted = [];
       for (let i = 0, len = jobsAccepted?.length; i < len; i++) {
-        projectsAccepted[i] = jobsAccepted[i]?.contributor_id?.project_id;
+        userProjectsAccepted[i] = jobsAccepted[i]?.contributor_id?.project_id;
       }
 
-      return res.json({
-        projectsAccepted,
-      });
+      return res.json(userProjectsAccepted);
     } catch (error) {
       console.log(error);
       return res.status(500).json({
@@ -201,14 +189,12 @@ const controller = {
       )
         .lean()
         .populate({ path: 'project_id', select: '-__v -_id -user_id' });
-      const followingProjects = [];
+      const projectsUserFollowing = [];
       for (let i = 0, len = followingProjectsRelationship.length; i < len; i++) {
-        followingProjects[i] = followingProjectsRelationship[i]?.project_id;
+        projectsUserFollowing[i] = followingProjectsRelationship[i]?.project_id;
       }
 
-      return res.json({
-        followingProjects,
-      });
+      return res.json(projectsUserFollowing);
     } catch (error) {
       console.log(error);
       return res.status(500).json({
@@ -218,6 +204,15 @@ const controller = {
   },
 
   editProfile: async (req, res) => {
+    const profileOwner = await UserModel.findOne({ username: req.authUser.username });
+    const user = await UserModel.findOne({ username: req.params.username });
+    // authorisation check: whether user is the project owner
+    if (user?._id.toString() !== profileOwner._id.toString()) {
+      return res.status(401).json({
+        error: 'User is not authorised to change this profile',
+      });
+    }
+
     const { name, tagline, skills, interests, linkedin, github, twitter, facebook } = req.body;
     const file = req.file;
 
@@ -231,6 +226,9 @@ const controller = {
         req.body[`profile_pic_url`] = result.url || 'logo helloworld.img';
       } catch (error) {
         console.log(error);
+        return res.status(401).json({
+          error: 'Failed to upload profile Images',
+        });
       }
     }
     const profile_pic_url = req.body['profile_pic_url'];
@@ -259,14 +257,6 @@ const controller = {
       });
     }
     try {
-      const profileOwner = await UserModel.findOne({ username: req.authUser.username });
-      const user = await UserModel.findOne({ username: req.params.username });
-      // authorisation check: whether user is the project owner
-      if (user?._id.toString() !== profileOwner._id.toString()) {
-        return res.status(401).json({
-          error: 'User is not authorised to change this profile',
-        });
-      }
       const skillsArr = skills
         ?.split(',')
         .map((item) => item.trim())
