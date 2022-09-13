@@ -8,13 +8,13 @@ const UserModel = require('../models/userModel');
 const validator = require('../validations/contributorValidation');
 const validSkills = require('../seeds/predefined-data/skills.json');
 
-const getData = async (req) => {
+const getData = async (username, contributorID) => {
   try {
-    let user = await UserModel.findOne({ username: req.authUser.username });
-    if (req.params.username) {
-      user = await UserModel.findOne({ username: req.params.username });
-    }
-    const contributor = await ContributorModel.findOne({ _id: req.params.id });
+    let user = await UserModel.findOne({ username });
+    // if (req.params.username) {
+    //   user = await UserModel.findOne({ username: req.params.username });
+    // }
+    const contributor = await ContributorModel.findById(contributorID);
     const project = await ProjectModel.findOne({ _id: contributor?.project_id });
       const relation = await RelationshipModel.findOne({ 
       user_id: user._id,
@@ -206,7 +206,7 @@ const controller = {
 
   addApplicant: async (req, res) => {
     try {
-      const { user_id, contributor_id, projectOwnerId, relation } = await getData(req);
+      const { user_id, contributor_id, projectOwnerId, relation } = await getData(req.authUser.username, req.params.id);
 
       if (relation) {
         return res.status(409).json({
@@ -236,7 +236,7 @@ const controller = {
 
   removeApplicant: async (req, res) => {
     try {
-      const { relation }= await getData(req);
+      const { relation }= await getData(req.authUser.username, req.params.id);
       await relation.deleteOne();
       return res.json({
         message: `successfully delete ${relation._id}`,
@@ -250,7 +250,7 @@ const controller = {
 
   acceptApplicant: async (req, res) => {
     try {
-      const { relation }= await getData(req);
+      const { relation }= await getData(req.params.username, req.params.id);
       await relation.updateOne({ state: 'accepted' });
       return res.json({
         message: `Updated relationship ${relation._id} state to accepted`,
@@ -265,7 +265,7 @@ const controller = {
 
   rejectApplicant: async (req, res) => {
     try {
-      const { relation }= await getData(req);
+      const { relation }= await getData(req.params.username, req.params.id);
       await relation.updateOne({ state: 'rejected' });
       return res.json({
         message: `Updated relationship ${relation._id} state to rejected`,
