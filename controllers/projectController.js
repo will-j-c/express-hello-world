@@ -7,32 +7,41 @@ const ContributorRelationshipsModel = require('../models/contributorsRelationshi
 const ProjectsRelationshipModel = require('../models/projectsRelationship');
 const projectValidationSchema = require('../validations/projectValidation');
 const ImageKit = require('imagekit');
+const res = require('express/lib/response');
 
 const imageKit = new ImageKit({
   publicKey: 'public_QbELL12FWyFW2r8fpAWMLY2t6j0=',
   privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
   urlEndpoint: 'https://ik.imagekit.io/wu6yrdrjf/',
 });
-const getLogoUrl = async (photoUploaded, fileName) => {
+const getLogoUrl = async (photoUploaded, fileName, req) => {
   try {
-    const logo_from_multer = photoUploaded.logo_url[0];
-    const logo_from_imageKit = await imageKit.upload({
-      file: logo_from_multer.buffer,
-      fileName: `${fileName}-logo_url-${Date.now()}`,
-      folder: `helloworld/logo_url`,
-    });
-    return logo_from_imageKit.url;
+    if (photoUploaded?.logo_url) {
+      const logo_from_multer = photoUploaded.logo_url[0];
+      const logo_from_imageKit = await imageKit.upload({
+        file: logo_from_multer.buffer,
+        fileName: `${fileName}-logo_url-${Date.now()}`,
+        folder: `helloworld/logo_url`,
+      });
+      return logo_from_imageKit.url;
+    } else {
+      console.log('wrong input name into imageKitIo');
+      return 'https://i.pinimg.com/564x/a9/d6/7e/a9d67e7c7c1f738141b3d728c31b2dd8.jpg';
+    }
   } catch (error) {
     console.log(error);
+    return res.status(500).json({
+      error: 'Failed to upload project logo',
+    });
   }
 };
 
 const getProjectImageUrls = async (photosUploadedArr, fileName) => {
   try {
     let photosImageKit = [];
-    for (let i = 0, len = photosUploadedArr.length; i < len; i++) {
+    for (let i = 0, len = photosUploadedArr?.length; i < len; i++) {
       const project_image = await imageKit.upload({
-        file: photosUploadedArr[i].buffer,
+        file: photosUploadedArr[i]?.buffer,
         fileName: `${fileName}-image_urls-${Date.now()}`,
         folder: `helloworld/image_urls`,
       });
@@ -79,6 +88,9 @@ const controller = {
           error: 'Failed to upload project Images',
         });
       }
+    } else {
+      req.body.logo_url = 'https://i.pinimg.com/564x/a9/d6/7e/a9d67e7c7c1f738141b3d728c31b2dd8.jpg';
+      req.body.image_urls = null;
     }
     //define projectOwner
     const projectOwner = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
