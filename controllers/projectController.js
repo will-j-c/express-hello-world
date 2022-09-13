@@ -32,12 +32,29 @@ const controller = {
     return res.json(projects);
   },
   createProject: async (req, res) => {
-    //get URL after user upload images for logo and project-photos:
+    console.log(req.file);
     const projectPhotoUrls = {};
-    // console.log(req.files);
-    if (req.files) {
-      const projectPhotoUploaded = req.files;
-      console.log(req.files);
+    const uploadedLogo = req.file;
+    console.log(uploadedLogo);
+    if (uploadedLogo) {
+      try {
+        const result = await imageKit.upload({
+          file: file.buffer,
+          fileName: `logo-${req.body.slug}-${Date.now()}`,
+          folder: `helloworld/project-logo`,
+        });
+        req.body.logo_url =
+          result.url || 'https://i.pinimg.com/564x/59/ba/29/59ba296266c7ac7278f8c770c3508a27.jpg';
+      } catch (error) {
+        console.log(error.message);
+        res.status(501).json({
+          error: 'Failed to upload photos',
+        });
+      }
+    }
+    // const uploadedProjectImage = req.files;
+    // console.log(req.file);
+    if (1 === 3) {
       for (let field in projectPhotoUploaded) {
         const result = await imageKit.upload({
           file: projectPhotoUploaded[field][0].buffer,
@@ -47,9 +64,7 @@ const controller = {
         projectPhotoUrls[field] = result.url;
       }
     }
-    console.log(projectPhotoUrls);
-    req.body.logo_url = projectPhotoUrls['project_logo_url'];
-    // req.body.image_urls = projectPhotoUrls['project_image_urls'];
+
     //define projectOwner
     const projectOwner = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
     req.body.user_id = projectOwner?._id.toString();

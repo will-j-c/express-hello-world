@@ -22,10 +22,6 @@ router.put(
   '/:slug',
   authMiddleware.isAuthenticated,
   authMiddleware.isAuthorized,
-  upload.fields([
-    { name: 'project_logo_url', maxCount: 1 },
-    { name: 'project_image_urls', maxCount: 10 },
-  ]),
   projectController.editProject
 );
 router.delete(
@@ -38,10 +34,8 @@ router.get('/', projectController.showAllProjects);
 router.post(
   '/',
   authMiddleware.isAuthenticated,
-  upload.fields([
-    { name: 'project_logo_url', maxCount: 1 },
-    { name: 'project_image_urls', maxCount: 10 },
-  ]),
+  upload.single('project_logo_url'),
+  upload.array('project_image_urls', 12),
   projectController.createProject
 );
 
