@@ -202,8 +202,6 @@ const controller = {
         })
       }
 
-      console.log(`user_id is ${user_id}`);
-      console.log(`projectOwner_id is ${projectOwner_id}`);
       if (user_id.toString() === projectOwner_id.toString()) {
         return res.status(409).json({
           error: 'Project owner cannot apply to be a contributor',
@@ -230,7 +228,7 @@ const controller = {
       await relation.deleteOne();
       return res.json({
         message: `successfully delete ${relation._id}`,
-      })
+      });
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to delete',
@@ -267,6 +265,6 @@ const controller = {
       });
     }
   },
-}
+};
 
 module.exports = controller;
