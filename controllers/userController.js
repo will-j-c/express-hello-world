@@ -33,16 +33,16 @@ const controller = {
     }
   },
 
-  showProfile: async (req, res) => {
+  showUserProfile: async (req, res) => {
     const username = req.params.username;
     try {
-      const profileOwner = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
-      if (!profileOwner) {
+      const userProfile = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
+      if (!userProfile) {
         return res.status(404).json();
       }
 
       return res.json({
-        profileOwner,
+        userProfile,
       });
     } catch (error) {
       return res.status(500).json({
