@@ -6,6 +6,43 @@ const ContributorModel = require('../models/contributorModel');
 const ContributorRelationshipsModel = require('../models/contributorsRelationship');
 const ProjectsRelationshipModel = require('../models/projectsRelationship');
 const projectValidationSchema = require('../validations/projectValidation');
+const ImageKit = require('imagekit');
+
+const imageKit = new ImageKit({
+  publicKey: 'public_QbELL12FWyFW2r8fpAWMLY2t6j0=',
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+  urlEndpoint: 'https://ik.imagekit.io/wu6yrdrjf/',
+});
+const getLogoUrl = async (photoUploaded, fileName) => {
+  try {
+    const logo_from_multer = photoUploaded.logo_url[0];
+    const logo_from_imageKit = await imageKit.upload({
+      file: logo_from_multer.buffer,
+      fileName: `${fileName}-logo_url-${Date.now()}`,
+      folder: `helloworld/logo_url`,
+    });
+    return logo_from_imageKit.url;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getProjectImageUrls = async (photosUploadedArr, fileName) => {
+  try {
+    let photosImageKit = [];
+    for (let i = 0, len = photosUploadedArr.length; i < len; i++) {
+      const project_image = await imageKit.upload({
+        file: photosUploadedArr[i].buffer,
+        fileName: `${fileName}-image_urls-${Date.now()}`,
+        folder: `helloworld/image_urls`,
+      });
+      photosImageKit[i] = project_image.url;
+    }
+    return photosImageKit;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const controller = {
   showAllProjects: async (req, res) => {
@@ -25,6 +62,28 @@ const controller = {
     return res.json(projects);
   },
   createProject: async (req, res) => {
+    if (req.files) {
+      try {
+        req.body.logo_url = await getLogoUrl(req.files, req.body.slug);
+      } catch (error) {
+        console.log(error);
+        return res.status(401).json({
+          error: 'Failed to upload project logo',
+        });
+      }
+      try {
+        req.body.image_urls = await getProjectImageUrls(req.files.image_urls, req.body.slug);
+      } catch (error) {
+        console.log(error);
+        return res.status(401).json({
+          error: 'Failed to upload project Images',
+        });
+      }
+    }
+    //define projectOwner
+    const projectOwner = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
+    req.body.user_id = projectOwner?._id.toString();
+
     // Validations
     let validatedResults = null;
     try {

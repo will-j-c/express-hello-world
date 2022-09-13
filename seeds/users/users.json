@@ -7,18 +7,16 @@
     "tagline": "permanently in pain",
     "profile_pic_url": "https://i.kym-cdn.com/entries/icons/mobile/000/016/546/hidethepainharold.jpg"
   },
-  
+
   {
     "name": "Steve MineCraft",
     "username": "steve",
     "email": "steve@test.com",
     "hash": "steve123",
-    "socmed": [
-      {
-        "name": "github",
-        "url": "https://github.com/ZoeNguyen73"
-      }
-    ]
+    "socmed": {
+      "github": "https://github.com/ZoeNguyen73",
+      "faceboook": "https://www.facebook.com/"
+    }
   },
 
   {
