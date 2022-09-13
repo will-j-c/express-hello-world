@@ -26,7 +26,6 @@ const controller = {
         { $sort: { updatedAt: -1 } },
         { $project: { hash: 0 } },
       ]);
-      console.log(users);
       return res.json(users);
     } catch (error) {
       return res.status(500).json({
@@ -124,7 +123,6 @@ const controller = {
         });
         req.body[`profile_pic_url`] = result.url || 'logo helloworld.img';
       } catch (error) {
-        console.log(error.message);
       }
     }
     const profile_pic_url = req.body['profile_pic_url'];
@@ -147,7 +145,6 @@ const controller = {
         profile_pic_url,
       });
     } catch (error) {
-      console.log(error);
       return res.status(400).json({
         error: 'Invalid input',
       });
@@ -171,10 +168,8 @@ const controller = {
         { username: req.params.username },
         { name, tagline, skillsArr, interestsArr, socmed, profile_pic_url }
       );
-      console.log(profile_pic_url);
       return res.status(201).json();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to edit profile',
       });
@@ -241,7 +236,6 @@ const controller = {
       }
       return res.status(204).json();
     } catch (error) {
-      console.log(error.message);
       return res.status(500).json({
         error: 'Failed to follow User',
       });
@@ -266,7 +260,6 @@ const controller = {
       }
       return res.status(204).json();
     } catch (error) {
-      console.log(error.message);
       return res.status(500).json({
         error: 'Failed to unfollow User',
       });
@@ -302,7 +295,6 @@ const controller = {
 
       return res.status(200).json();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to delete account',
       });
@@ -314,7 +306,6 @@ const controller = {
     const verified = jwt.verify(token, process.env.JWT_SECRET_ACTIVATE);
 
     if (!verified) {
-      console.log(error);
       return res.status(401).json({
         error: 'Activation link expired',
       });

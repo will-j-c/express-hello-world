@@ -95,7 +95,6 @@ const controller = {
     try {
       await validator.details.validateAsync(data);
     } catch (error) {
-      console.log(error);
       return res.status(400).json({
         error: 'Invalid input',
       });
@@ -128,7 +127,6 @@ const controller = {
 
       return res.status(201).json(newContributor);
     } catch (error) {
-      console.log(`error: ${error}`);
       return res.status(500).json({
         error: 'Failed to fetch data',
       });
@@ -140,7 +138,6 @@ const controller = {
     try {
       data = await validator.details.validateAsync(req.body);
     } catch (error) {
-      console.log(error);
       return res.status(400).json({
         error: 'Invalid input',
       });
@@ -171,7 +168,6 @@ const controller = {
       );
       return res.json(updatedContributor);
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to edit contributor',
       });
@@ -215,7 +211,6 @@ const controller = {
       return res.json(newRelation);
 
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to apply',
       });
@@ -244,7 +239,6 @@ const controller = {
         message: `Updated relationship ${relation._id} state to accepted`,
       });
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to update contributor status',
       });
@@ -259,7 +253,6 @@ const controller = {
         message: `Updated relationship ${relation._id} state to rejected`,
       });
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to update contributor status',
       });

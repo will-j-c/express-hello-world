@@ -5,7 +5,6 @@ const UserModel = require('../models/userModel');
 const commentValidation = require('../validations/commentValidation');
 
 const callDatabase = async (req) => {
-  console.log(req.params.id);
   const projectId = await ProjectModel.findOne({ slug: req.params.slug }, { _id: 1 });
   const userId = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
   const commentId = await CommentModel.findOne({ _id: req.params.id }, { _id: 1 });
@@ -33,7 +32,6 @@ const controller = {
         };
         validatedResults = await commentValidation.post.validateAsync(comment);
       } catch (error) {
-        console.log(error);
         return res.status(400).json({
           error: 'Validation failed',
         });
@@ -42,12 +40,12 @@ const controller = {
       await CommentModel.create(validatedResults);
       return res.json();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to post comment',
       });
     }
   },
+
   editComment: async (req, res) => {
     try {
       const [, userId, commentId] = await callDatabase(req);
@@ -66,7 +64,6 @@ const controller = {
         };
         validatedResults = await commentValidation.edit.validateAsync(comment);
       } catch (error) {
-        console.log(error);
         return res.status(400).json({
           error: 'Validation failed',
         });
@@ -74,12 +71,12 @@ const controller = {
       await CommentModel.updateOne(commentId, validatedResults);
       return res.json();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to edit comment',
       });
     }
   },
+
   deleteComment: async (req, res) => {
     try {
       const [, userId, commentId] = await callDatabase(req);
@@ -93,7 +90,6 @@ const controller = {
       commentId.deleteOne();
       return res.json();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to delete comment',
       });
