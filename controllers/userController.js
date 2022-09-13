@@ -111,6 +111,14 @@ const controller = {
       });
     }
   },
+
+  showUserProjects: async (req, res) => {},
+  showUserProjectsPublic: async (req, res) => {},
+  showUserProjectsDraft: async (req, res) => {},
+  showUserProjectsApplied: async (req, res) => {},
+  showUserProjectsAccepted: async (req, res) => {},
+  showUserProjectsFollowing: async (req, res) => {},
+
   editProfile: async (req, res) => {
     const { name, tagline, skills, interests, linkedin, github, twitter, facebook } = req.body;
     const file = req.file;

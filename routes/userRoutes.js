@@ -10,6 +10,14 @@ router.post('/:token/activate', userController.activateAccount);
 router.get('/:username/following', userController.showFollowingUsers);
 router.get('/:username/followers', userController.showFollowerUsers);
 router.post('/:username/follow', userAuth.isAuthenticated, userController.followUser);
+
+router.get('/:username/projects/public', userController.showUserProjects);
+router.get('/:username/projects/public', userController.showUserProjectsPublic);
+router.get('/:username/projects/draft', userController.showUserProjectsDraft);
+router.get('/:username/projects/applied', userController.showUserProjectsApplied);
+router.get('/:username/projects/accepted', userController.showUserProjectsAccepted);
+router.get('/:username/projects/following', userController.showUserProjectsFollowing);
+
 router.put(
   '/:username',
   userAuth.isAuthenticated,
