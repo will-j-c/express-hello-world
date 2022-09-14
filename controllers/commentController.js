@@ -4,36 +4,37 @@ const ProjectModel = require('../models/projectModel');
 const UserModel = require('../models/userModel');
 const commentValidation = require('../validations/commentValidation');
 
-const callDatabase = async (req) => {
-  console.log(req.params.id);
-  const projectId = await ProjectModel.findOne({ slug: req.params.slug }, { _id: 1 });
-  const userId = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
-  const commentId = await CommentModel.findOne({ _id: req.params.id }, { _id: 1 });
-  return [projectId, userId, commentId];
-};
+const callDatabase = async ({ id, slug, username }) => ({
+  projectId: await ProjectModel.findOne({ slug }, { _id: 1 }),
+  userId: await UserModel.findOne({ username }, { _id: 1 }),
+  commentId: await CommentModel.findOne({ _id: id }, { _id: 1 }),
+});
 
 const controller = {
   postComment: async (req, res) => {
     try {
-      const [projectId, userId] = await callDatabase(req);
+      const databaseCall = await callDatabase({
+        id: req.params.id,
+        slug: req.params.slug,
+        username: req.authUser.username,
+      });
       // Check user and project exist
-      if (!userId) {
+      if (!databaseCall.userId) {
         return res.status(403).json();
       }
-      if (!projectId) {
+      if (!databaseCall.projectId) {
         return res.status(400).json();
       }
       // Validations
       let validatedResults = null;
       try {
         const comment = {
-          user_id: userId._id,
-          project_id: projectId._id,
+          user_id: databaseCall.userId._id,
+          project_id: databaseCall.projectId._id,
           content: req.body.content,
         };
         validatedResults = await commentValidation.post.validateAsync(comment);
       } catch (error) {
-        console.log(error);
         return res.status(400).json({
           error: 'Validation failed',
         });
@@ -42,20 +43,24 @@ const controller = {
       await CommentModel.create(validatedResults);
       return res.json();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to post comment',
       });
     }
   },
+
   editComment: async (req, res) => {
     try {
-      const [, userId, commentId] = await callDatabase(req);
+      const databaseCall = await callDatabase({
+        id: req.params.id,
+        slug: req.params.slug,
+        username: req.authUser.username,
+      });
       // Check user and comment exists
-      if (!userId) {
+      if (!databaseCall.userId) {
         return res.status(403).json();
       }
-      if (!commentId) {
+      if (!databaseCall.commentId) {
         return res.status(400).json();
       }
       // Validations
@@ -66,34 +71,36 @@ const controller = {
         };
         validatedResults = await commentValidation.edit.validateAsync(comment);
       } catch (error) {
-        console.log(error);
         return res.status(400).json({
           error: 'Validation failed',
         });
       }
-      await CommentModel.updateOne(commentId, validatedResults);
+      await CommentModel.updateOne(databaseCall.commentId, validatedResults);
       return res.json();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to edit comment',
       });
     }
   },
+
   deleteComment: async (req, res) => {
     try {
-      const [, userId, commentId] = await callDatabase(req);
+      const databaseCall = await callDatabase({
+        id: req.params.id,
+        slug: req.params.slug,
+        username: req.authUser.username,
+      });
       // Check user and comment exists
-      if (!userId) {
+      if (!databaseCall.userId) {
         return res.status(403).json();
       }
-      if (!commentId) {
+      if (!databaseCall.commentId) {
         return res.status(400).json();
       }
-      commentId.deleteOne();
+      databaseCall.commentId.deleteOne();
       return res.json();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to delete comment',
       });

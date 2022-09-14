@@ -28,7 +28,6 @@ const getLogoUrl = async (photoUploaded, fileName) => {
       return 'https://i.pinimg.com/564x/a9/d6/7e/a9d67e7c7c1f738141b3d728c31b2dd8.jpg';
     }
   } catch (error) {
-    console.log(error);
   }
 };
 
@@ -45,7 +44,6 @@ const getProjectImageUrls = async (photosUploadedArr, fileName) => {
     }
     return photosImageKit;
   } catch (error) {
-    console.log(error);
   }
 };
 
@@ -70,12 +68,12 @@ const controller = {
     res.status(200);
     return res.json(projects);
   },
+  
   createProject: async (req, res) => {
     if (req.files) {
       try {
         req.body.logo_url = await getLogoUrl(req.files, req.body.slug);
       } catch (error) {
-        console.log(error);
         return res.status(401).json({
           error: 'Failed to upload project logo',
         });
@@ -83,7 +81,6 @@ const controller = {
       try {
         req.body.image_urls = await getProjectImageUrls(req.files.image_urls, req.body.slug);
       } catch (error) {
-        console.log(error);
         return res.status(401).json({
           error: 'Failed to upload project Images',
         });
@@ -102,7 +99,6 @@ const controller = {
     try {
       validatedResults = await projectValidationSchema.create.validateAsync(req.body);
     } catch (error) {
-      console.log(error);
       return res.status(400).json({
         error: 'Validation failed',
       });
@@ -111,13 +107,13 @@ const controller = {
     try {
       await ProjectModel.create(validatedResults);
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to create project',
       });
     }
     return res.status(201).json();
   },
+
   editProject: async (req, res) => {
     // check If user change project images and logo?
     let newProjectImages = [];
@@ -161,7 +157,6 @@ const controller = {
     try {
       validatedResults = await projectValidationSchema.edit.validateAsync(req.body);
     } catch (error) {
-      console.log(error);
       return res.status(400).json({
         error: 'Validation failed',
       });
@@ -171,12 +166,12 @@ const controller = {
       await ProjectModel.findOneAndUpdate({ slug: req.params.slug }, validatedResults);
       return res.status(201).json();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to edit project',
       });
     }
   },
+
   deleteProject: async (req, res) => {
     try {
       // Find the project to delete so that you can use the _id, if the project doesn't exist return 404 Not Found
@@ -198,13 +193,13 @@ const controller = {
       // Delete project in projects
       projectToDelete.deleteOne();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to delete project',
       });
     }
     return res.status(200).json();
   },
+
   projectShow: async (req, res) => {
     let project = null;
     let createdBy = null;
@@ -260,7 +255,6 @@ const controller = {
       delete project._id;
       delete project.user_id;
     } catch (error) {
-      console.log(error);
       res.status(500);
       return res.json({
         error: 'Failed to fetch project from database',
@@ -269,6 +263,7 @@ const controller = {
     res.status(200);
     return res.json({ project, createdBy, comments, jobs });
   },
+
   followProject: async (req, res) => {
     try {
       const user = await UserModel.findOne({ username: req.params.username }, { _id: 1 }).lean();
@@ -284,13 +279,13 @@ const controller = {
       }
       return res.status(204).json();
     } catch (error) {
-      console.log(error);
       res.status(500);
       return res.json({
         error: 'Failed to follow project',
       });
     }
   },
+
   unfollowProject: async (req, res) => {
     try {
       const user = await UserModel.findOne({ username: req.params.username }, { _id: 1 }).lean();
@@ -305,7 +300,6 @@ const controller = {
       }
       return res.status(204).json();
     } catch (error) {
-      console.log(error);
       res.status(500);
       return res.json({
         error: 'Failed to unfollow project',
