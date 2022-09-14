@@ -87,12 +87,7 @@ const userAuth = {
     async function contributorsAuth() {
       let projectFilter = null;
       const contributor = await ContributorModel.findOne({ _id: req.params.id });
-      if (req.body.project_slug) {
-        projectFilter = { slug: req.body.project_slug };
-      } else if (contributor) {
-        projectFilter = { _id: contributor.project_id };
-      }
-      const project = await ProjectModel.findOne(projectFilter);
+      const project = await ProjectModel.findById(contributor.project_id);
       if (project.user_id.toString() === user._id.toString()) {
         req.contributorID = contributor?._id;
         req.projectID = project._id;
