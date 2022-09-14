@@ -225,7 +225,6 @@ const controller = {
         req.body[`profile_pic_url`] =
           result.url || 'https://i.pinimg.com/564x/a9/d6/7e/a9d67e7c7c1f738141b3d728c31b2dd8.jpg';
       } catch (error) {
-        console.log(error);
         return res.status(401).json({
           error: 'Failed to upload profile Images',
         });
@@ -251,7 +250,6 @@ const controller = {
         profile_pic_url,
       });
     } catch (error) {
-      console.log(error);
       return res.status(400).json({
         error: 'Invalid input',
       });
@@ -270,7 +268,6 @@ const controller = {
       );
       return res.status(201).json();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to edit profile',
       });
@@ -337,7 +334,6 @@ const controller = {
       }
       return res.status(204).json();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to follow User',
       });
@@ -362,7 +358,6 @@ const controller = {
       }
       return res.status(204).json();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to unfollow User',
       });
@@ -398,7 +393,6 @@ const controller = {
 
       return res.status(200).json();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to delete account',
       });
@@ -410,7 +404,6 @@ const controller = {
     const verified = jwt.verify(token, process.env.JWT_SECRET_ACTIVATE);
 
     if (!verified) {
-      console.log(error);
       return res.status(401).json({
         error: 'Activation link expired',
       });
