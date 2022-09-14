@@ -4,7 +4,7 @@ const Joi = require('joi');
 const contributorValidation = {
   details: Joi.object({
     title: Joi.string().min(3).max(30).required(),
-    skills: Joi.string().required(),
+    skills: Joi.array().required(),
     is_remote: Joi.boolean().required(),
     city: Joi.string(),
     remuneration: Joi.string(),
