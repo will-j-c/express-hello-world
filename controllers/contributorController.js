@@ -100,7 +100,7 @@ const controller = {
 
   add: async (req, res) => {
     let data = null;
-    
+
     try {
       data = await validator.details.validateAsync(req.body);
     } catch (error) {
@@ -127,12 +127,9 @@ const controller = {
         });
       }
 
-      const skillsArr = skills
-        .split(',')
-        .map((item) => item.trim())
-        .filter((item) => validSkills.includes(item));
+      const validatedSkills = skills.filter(skill => validSkills.includes(skill));
 
-      data.skills = skillsArr;
+      data.skills = validatedSkills;
       data.project_id = project._id;
 
       const newContributor = await ContributorModel.create(data);
@@ -157,11 +154,8 @@ const controller = {
 
     const relations = await RelationshipModel.find({ contributor_id: req.contributorID });
 
-    const skillsArr = data.skills
-      .split(',')
-      .map((item) => item.trim())
-      .filter((item) => validSkills.includes(item));
-    data.skills = skillsArr;
+    const validatedSkills = data.skills.filter(skill => validSkills.includes(skill));
+    data.skills = validatedSkills;
 
     // cannot change available slots below the # of accepted users
     const acceptedRelations = relations.filter((relation) => relation.state === 'accepted');
