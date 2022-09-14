@@ -10,6 +10,7 @@ const UserValidator = require('../validations/userValidation');
 const controller = {
   register: async (req, res) => {
     let validatedResults = null;
+    console.log(req.body)
     try {
       validatedResults = await UserValidator.register.validateAsync(req.body);
     } catch (error) {
