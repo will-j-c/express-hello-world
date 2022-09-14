@@ -141,9 +141,17 @@ const controller = {
       }
     }
 
-    const oldProjectData = await ProjectModel.findOne({ slug: req.params.slug });
+    const oldProjectData = await ProjectModel.findOne(
+      { slug: req.params.slug },
+      { image_urls: 1, _id: 0 }
+    );
     const oldImages = oldProjectData?.image_urls;
-    const oldImagesAfterDelete = diffArray(oldImages, deletedProjectImages);
+    //if user dont delete any image:
+    let oldImagesAfterDelete = oldImages;
+    //if user delete some images:
+    if (deletedProjectImages) {
+      oldImagesAfterDelete = diffArray(oldImages, deletedProjectImages);
+    }
 
     req.body.image_urls = [...oldImagesAfterDelete, ...newProjectImages];
     delete req.body.deletedImages;
