@@ -14,7 +14,7 @@ const imageKit = new ImageKit({
   privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
   urlEndpoint: 'https://ik.imagekit.io/wu6yrdrjf/',
 });
-const getLogoUrl = async (photoUploaded, fileName, req) => {
+const getLogoUrl = async (photoUploaded, fileName) => {
   try {
     if (photoUploaded?.logo_url) {
       const logo_from_multer = photoUploaded.logo_url[0];
@@ -30,9 +30,6 @@ const getLogoUrl = async (photoUploaded, fileName, req) => {
     }
   } catch (error) {
     console.log(error);
-    return res.status(500).json({
-      error: 'Failed to upload project logo',
-    });
   }
 };
 
@@ -89,6 +86,7 @@ const controller = {
         });
       }
     } else {
+      //if user not input logo and project images, the value below will be add into database
       req.body.logo_url = 'https://i.pinimg.com/564x/a9/d6/7e/a9d67e7c7c1f738141b3d728c31b2dd8.jpg';
       req.body.image_urls = null;
     }
@@ -118,6 +116,33 @@ const controller = {
     return res.status(201).json();
   },
   editProject: async (req, res) => {
+    // check If user change project images and logo?
+    let newProjectImages = [];
+    const deletedProjectImages = req.body.delete;
+    if (req.files) {
+      try {
+        req.body.logo_url = await getLogoUrl(req.files, req.body.slug);
+      } catch (error) {
+        console.log(error);
+        return res.status(401).json({
+          error: 'Failed to upload project logo',
+        });
+      }
+      try {
+        newProjectImages = await getProjectImageUrls(req.files.image_urls, req.body.slug);
+      } catch (error) {
+        console.log(error);
+        return res.status(401).json({
+          error: 'Failed to upload project Images',
+        });
+      }
+    }
+
+    const oldProjectData = await ProjectModel.findOne({ slug: req.params.slug });
+    const oldImages = oldProjectData?.image_urls;
+    const oldImagesAfterDelete = console.log(oldImages);
+
+    req.body.image_urls = [];
     // Validations
     let validatedResults = null;
     try {
