@@ -25,7 +25,6 @@ const getLogoUrl = async (photoUploaded, fileName) => {
       });
       return logo_from_imageKit.url;
     } else {
-      console.log('wrong input name into imageKitIo');
       return 'https://i.pinimg.com/564x/a9/d6/7e/a9d67e7c7c1f738141b3d728c31b2dd8.jpg';
     }
   } catch (error) {
@@ -48,6 +47,10 @@ const getProjectImageUrls = async (photosUploadedArr, fileName) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+const diffArray = (arr1, arr2) => {
+  return [...arr1, ...arr2].filter((v) => arr1.includes(v) !== arr2.includes(v));
 };
 
 const controller = {
@@ -118,7 +121,7 @@ const controller = {
   editProject: async (req, res) => {
     // check If user change project images and logo?
     let newProjectImages = [];
-    const deletedProjectImages = req.body.delete;
+    const deletedProjectImages = req.body.deletedImages;
     if (req.files) {
       try {
         req.body.logo_url = await getLogoUrl(req.files, req.body.slug);
@@ -140,10 +143,12 @@ const controller = {
 
     const oldProjectData = await ProjectModel.findOne({ slug: req.params.slug });
     const oldImages = oldProjectData?.image_urls;
-    const oldImagesAfterDelete = console.log(oldImages);
+    const oldImagesAfterDelete = diffArray(oldImages, deletedProjectImages);
 
-    req.body.image_urls = [];
+    req.body.image_urls = [...oldImagesAfterDelete, ...newProjectImages];
+    delete req.body.deletedImages;
     // Validations
+
     let validatedResults = null;
     try {
       validatedResults = await projectValidationSchema.edit.validateAsync(req.body);
@@ -266,7 +271,6 @@ const controller = {
         {},
         { upsert: true, new: true }
       );
-      console.log(updatedRelationship);
       if (updatedRelationship) {
         return res.status(201).json();
       }
