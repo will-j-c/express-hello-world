@@ -23,14 +23,19 @@ const userSchema = new mongoose.Schema({
     type: String,
   },
   skills: {
-    type: Array,
+    type: Array, // Array of String: ["skill", "skills", "skill"]
   },
   interests: {
-    type: Array,
+    type: Array, // Array of String: ["interest", "skiinterestsll", "interest"]
   },
   profile_pic_url: {
     type: String,
   },
+  // format of socmed:
+  //  socmed: {facebook: "abc.com",
+  //           linkedin: "abc.com",
+  //           github: "abc.com",
+  //           twitter: "abc.com",}
   socmed: {
     type: Object,
   },
