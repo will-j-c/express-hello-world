@@ -62,7 +62,6 @@ const controller = {
       ).lean();
       return res.json(userProjects);
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to fetch projects of this user from database',
       });
@@ -83,7 +82,6 @@ const controller = {
 
       return res.json(userProjectsPublic);
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to fetch public projects of this user from database',
       });
@@ -104,7 +102,6 @@ const controller = {
 
       return res.json(userProjectsDraft);
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to fetch draft projects of this user from database',
       });
@@ -137,7 +134,6 @@ const controller = {
 
       return res.json(userProjectApplied);
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to fetch applied projects of this user from database',
       });
@@ -170,7 +166,6 @@ const controller = {
 
       return res.json(userProjectsAccepted);
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to fetch contributed projects of this user from database',
       });
@@ -196,7 +191,6 @@ const controller = {
 
       return res.json(projectsUserFollowing);
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to fetch contributed projects of this user from database',
       });
@@ -258,13 +252,6 @@ const controller = {
       });
     }
     try {
-      // const skillsArr = skills
-      //   ?.split(',')
-      //   .map((item) => item.trim())
-      //   .filter((item) => validSkills.includes(item));
-
-      // const interestsArr = interests?.split(',').map((item) => item.trim());
-
       await UserModel.findOneAndUpdate(
         { username: req.params.username },
         { name, tagline, skills, interests, socmed, profile_pic_url }
