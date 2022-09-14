@@ -184,7 +184,7 @@ const controller = {
         return res.status(404).json();
       }
       const followingProjectsRelationship = await ProjectsRelationshipModel.find(
-        { user_id: profileOwner._id, state: 'published' },
+        { user_id: profileOwner._id },
         { project_id: 1, _id: 0 }
       )
         .lean()
@@ -212,14 +212,13 @@ const controller = {
         error: 'User is not authorised to change this profile',
       });
     }
-    const { name, tagline, skills, interests, linkedin, github, twitter, facebook } = req.body;
+    const { name, tagline, interests, linkedin, github, twitter, facebook } = req.body;
     const file = req.file;
-
     if (file) {
       try {
         const result = await imageKit.upload({
           file: file.buffer,
-          fileName: `${req.authUser.username}-Date.now()`,
+          fileName: `${req.authUser.username}-${Date.now()}`,
           folder: `helloworld/user-avatar`,
         });
         req.body[`profile_pic_url`] =
@@ -240,6 +239,9 @@ const controller = {
     //remove the empty attribute from socmedFormat
     const socmed = Object.fromEntries(Object.entries(socmedFormat).filter(([_, v]) => v != ''));
 
+    //handle skills:
+    const validatedSkills = req.body.skills?.filter((skill) => validSkills.includes(skill));
+    const skills = validatedSkills;
     try {
       await validator.profile.validateAsync({
         name,
@@ -248,6 +250,7 @@ const controller = {
         interests,
         socmed,
         profile_pic_url,
+        skills,
       });
     } catch (error) {
       return res.status(400).json({
