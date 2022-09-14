@@ -34,9 +34,8 @@ const controller = {
   },
 
   showUserProfile: async (req, res) => {
-    const username = req.params.username;
     try {
-      const userProfile = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
+      const userProfile = await UserModel.findOne({ username: req.params.username }, { __v: 0, hash: 0 }).lean();
       if (!userProfile) {
         return res.status(404).json();
       }
@@ -50,9 +49,8 @@ const controller = {
   },
 
   showUserProjects: async (req, res) => {
-    const username = req.params.username;
     try {
-      const profileOwner = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
+      const profileOwner = await UserModel.findOne({ username: req.params.username }, { __v: 0, hash: 0 }).lean();
       if (!profileOwner) {
         return res.status(404).json();
       }
@@ -67,10 +65,10 @@ const controller = {
       });
     }
   },
+
   showUserProjectsPublic: async (req, res) => {
-    const username = req.params.username;
     try {
-      const profileOwner = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
+      const profileOwner = await UserModel.findOne({ username: req.params.username }, { __v: 0, hash: 0 }).lean();
       if (!profileOwner) {
         return res.status(404).json();
       }
@@ -81,21 +79,18 @@ const controller = {
       ]);
 
       return res.json(userProjectsPublic);
+
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch public projects of this user from database',
       });
     }
   },
+
   showUserProjectsDraft: async (req, res) => {
-    const username = req.params.username;
     try {
-      const profileOwner = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
-      if (!profileOwner) {
-        return res.status(404).json();
-      }
       const userProjectsDraft = await ProjectModel.aggregate([
-        { $match: { state: 'draft', user_id: profileOwner._id } },
+        { $match: { state: 'draft', user_id: req.userID } },
         { $sort: { updatedAt: -1 } },
         { $project: { __v: 0, user_id: 0, _id: 0 } },
       ]);
@@ -107,16 +102,12 @@ const controller = {
       });
     }
   },
+
   showUserProjectsApplied: async (req, res) => {
-    const username = req.params.username;
     try {
-      const profileOwner = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
-      if (!profileOwner) {
-        return res.status(404).json();
-      }
       const appliedJobs = await ContributorRelationshipModel.find(
         {
-          user_id: profileOwner._id,
+          user_id: req.userID,
           state: 'applied',
         },
         { contributor_id: 1, _id: 0 }
@@ -139,10 +130,10 @@ const controller = {
       });
     }
   },
+
   showUserProjectsAccepted: async (req, res) => {
-    const username = req.params.username;
     try {
-      const profileOwner = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
+      const profileOwner = await UserModel.findOne({ username: req.params.username }, { __v: 0, hash: 0 }).lean();
       if (!profileOwner) {
         return res.status(404).json();
       }
@@ -171,15 +162,11 @@ const controller = {
       });
     }
   },
+
   showUserProjectsFollowing: async (req, res) => {
-    const username = req.params.username;
     try {
-      const profileOwner = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
-      if (!profileOwner) {
-        return res.status(404).json();
-      }
       const followingProjectsRelationship = await ProjectsRelationshipModel.find(
-        { user_id: profileOwner._id },
+        { user_id: req.userID },
         { project_id: 1, _id: 0 }
       )
         .lean()
@@ -190,6 +177,7 @@ const controller = {
       }
 
       return res.json(projectsUserFollowing);
+
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch contributed projects of this user from database',
@@ -198,14 +186,6 @@ const controller = {
   },
 
   editProfile: async (req, res) => {
-    const profileOwner = await UserModel.findOne({ username: req.authUser.username });
-    const user = await UserModel.findOne({ username: req.params.username });
-    // authorisation check: whether user is the project owner
-    if (user?._id.toString() !== profileOwner._id.toString()) {
-      return res.status(401).json({
-        error: 'User is not authorised to change this profile',
-      });
-    }
     const { name, tagline, interests, linkedin, github, twitter, facebook } = req.body;
     const file = req.file;
     if (file) {
@@ -225,10 +205,10 @@ const controller = {
     }
     const profile_pic_url = req.body['profile_pic_url'];
     const socmedFormat = {
-      facebook: req.body.facebook,
-      linkedin: req.body.linkedin,
-      github: req.body.github,
-      twitter: req.body.twitter,
+      facebook,
+      linkedin,
+      github,
+      twitter,
     };
     //remove the empty attribute from socmedFormat
     const socmed = Object.fromEntries(Object.entries(socmedFormat).filter(([_, v]) => v != ''));
@@ -257,6 +237,7 @@ const controller = {
         { name, tagline, skills, interests, socmed, profile_pic_url }
       );
       return res.status(201).json();
+
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to edit profile',
@@ -265,18 +246,18 @@ const controller = {
   },
 
   showFollowingUsers: async (req, res) => {
-    const username = req.params.username;
-    const user = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
+    const user = await UserModel.findOne({ username: req.params.username }, { __v: 0, hash: 0 }).lean();
     if (!user) {
       return res.status(404).json();
     }
-    let followingUsers = null;
+
     try {
-      followingUsers = await UsersRelationshipModel.find(
+      const followingUsers = await UsersRelationshipModel.find(
         { follower: user._id },
         { followee: 1 }
       ).populate({ path: 'followee', select: '-email -__v -hash' });
       return res.json(followingUsers);
+
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch followingUsers from database',
@@ -285,24 +266,25 @@ const controller = {
   },
 
   showFollowerUsers: async (req, res) => {
-    const username = req.params.username;
-    const user = await UserModel.findOne({ username }, { __v: 0, hash: 0 }).lean();
+    const user = await UserModel.findOne({ username: req.params.username }, { __v: 0, hash: 0 }).lean();
     if (!user) {
       return res.status(404).json();
     }
-    let followerUsers = null;
+
     try {
-      followerUsers = await UsersRelationshipModel.find(
+      const followerUsers = await UsersRelationshipModel.find(
         { followee: user._id },
         { follower: 1 }
       ).populate({ path: 'follower', select: '-email -__v -hash' });
       return res.json(followerUsers);
+
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch followingUsers from database',
       });
     }
   },
+
   followUser: async (req, res) => {
     try {
       const followee = await UserModel.findOne(
@@ -323,12 +305,14 @@ const controller = {
         return res.status(201).json();
       }
       return res.status(204).json();
+
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to follow User',
       });
     }
   },
+
   unfollowUser: async (req, res) => {
     try {
       const followee = await UserModel.findOne(
@@ -355,34 +339,29 @@ const controller = {
   },
 
   deleteAccount: async (req, res) => {
-    const profileOwner = await UserModel.findOne({ username: req.authUser.username });
-    const user = await UserModel.findOne({ username: req.params.username });
-    // authorisation check: whether user is the project owner
-    if (user?._id.toString() !== profileOwner?._id.toString()) {
-      return res.status(401).json({
-        error: 'User is not authorised to change this project',
-      });
-    }
-
     try {
-      const hostProjects = await ProjectModel.find({ user_id: profileOwner?._id }, { _id: 1 });
+      const user = await UserModel.findById(req.userID);
+      const user_id = user._id;
+      const hostProjects = await ProjectModel.find({ user_id }, { _id: 1 });
       if (hostProjects.length) {
         for (let i = 0, len = hostProjects.length; i < len; i += 1) {
           await ContributorModel.deleteMany({ project_id: hostProjects[i]._id });
         }
-        await ProjectModel.deleteMany({ user_id: profileOwner?._id });
+        await ProjectModel.deleteMany({ user_id });
       }
       await UsersRelationshipModel.deleteMany({
-        $or: [{ follower: profileOwner?._id }, { followee: profileOwner?._id }],
+        $or: [{ follower: user_id }, { followee: user_id }],
       });
-      await ContributorRelationshipModel.deleteMany({ user_id: profileOwner?._id });
-      await ProjectsRelationshipModel.deleteMany({ user_id: profileOwner?._id });
-      await CommentModel.deleteMany({ user_id: profileOwner?._id });
+      await ContributorRelationshipModel.deleteMany({ user_id });
+      await ProjectsRelationshipModel.deleteMany({ user_id });
+      await CommentModel.deleteMany({ user_id });
 
-      profileOwner?.deleteOne();
+      user.deleteOne();
 
       return res.status(200).json();
+
     } catch (error) {
+      console.log(error);
       return res.status(500).json({
         error: 'Failed to delete account',
       });
