@@ -49,7 +49,7 @@ const controller = {
     let projects = [];
     try {
       projects = await ProjectModel.aggregate([
-        { $match: {} },
+        { $match: {state: 'published'} },
         { $project: { _id: 0, user_id: 0, description: 0 } },
         { $sort: { updatedAt: -1 } },
       ]);
