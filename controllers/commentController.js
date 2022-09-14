@@ -35,7 +35,6 @@ const controller = {
         };
         validatedResults = await commentValidation.post.validateAsync(comment);
       } catch (error) {
-        console.log(error);
         return res.status(400).json({
           error: 'Validation failed',
         });
@@ -44,12 +43,12 @@ const controller = {
       await CommentModel.create(validatedResults);
       return res.json();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to post comment',
       });
     }
   },
+
   editComment: async (req, res) => {
     try {
       const databaseCall = await callDatabase({
@@ -72,7 +71,6 @@ const controller = {
         };
         validatedResults = await commentValidation.edit.validateAsync(comment);
       } catch (error) {
-        console.log(error);
         return res.status(400).json({
           error: 'Validation failed',
         });
@@ -80,12 +78,12 @@ const controller = {
       await CommentModel.updateOne(databaseCall.commentId, validatedResults);
       return res.json();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to edit comment',
       });
     }
   },
+
   deleteComment: async (req, res) => {
     try {
       const databaseCall = await callDatabase({
@@ -103,7 +101,6 @@ const controller = {
       databaseCall.commentId.deleteOne();
       return res.json();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to delete comment',
       });
