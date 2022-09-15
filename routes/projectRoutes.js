@@ -17,6 +17,8 @@ router.post(
   contributorController.add
 );
 
+router.get('/:slug/contributors', contributorController.showByProject);
+
 router.post(
   '/:slug/follow/:username',
   authMiddleware.isAuthenticated,
