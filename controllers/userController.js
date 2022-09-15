@@ -35,7 +35,10 @@ const controller = {
 
   showUserProfile: async (req, res) => {
     try {
-      const userProfile = await UserModel.findOne({ username: req.params.username }, { __v: 0, hash: 0 }).lean();
+      const userProfile = await UserModel.findOne(
+        { username: req.params.username },
+        { __v: 0, hash: 0 }
+      ).lean();
       if (!userProfile) {
         return res.status(404).json();
       }
@@ -50,7 +53,10 @@ const controller = {
 
   showUserProjects: async (req, res) => {
     try {
-      const profileOwner = await UserModel.findOne({ username: req.params.username }, { __v: 0, hash: 0 }).lean();
+      const profileOwner = await UserModel.findOne(
+        { username: req.params.username },
+        { __v: 0, hash: 0 }
+      ).lean();
       if (!profileOwner) {
         return res.status(404).json();
       }
@@ -68,7 +74,10 @@ const controller = {
 
   showUserProjectsPublic: async (req, res) => {
     try {
-      const profileOwner = await UserModel.findOne({ username: req.params.username }, { __v: 0, hash: 0 }).lean();
+      const profileOwner = await UserModel.findOne(
+        { username: req.params.username },
+        { __v: 0, hash: 0 }
+      ).lean();
       if (!profileOwner) {
         return res.status(404).json();
       }
@@ -79,7 +88,6 @@ const controller = {
       ]);
 
       return res.json(userProjectsPublic);
-
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch public projects of this user from database',
@@ -117,7 +125,10 @@ const controller = {
 
   showUserProjectsAccepted: async (req, res) => {
     try {
-      const profileOwner = await UserModel.findOne({ username: req.params.username }, { __v: 0, hash: 0 }).lean();
+      const profileOwner = await UserModel.findOne(
+        { username: req.params.username },
+        { __v: 0, hash: 0 }
+      ).lean();
       if (!profileOwner) {
         return res.status(404).json();
       }
@@ -161,7 +172,6 @@ const controller = {
       }
 
       return res.json(projectsUserFollowing);
-
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch contributed projects of this user from database',
@@ -221,7 +231,6 @@ const controller = {
         { name, tagline, skills, interests, socmed, profile_pic_url }
       );
       return res.status(201).json();
-
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to edit profile',
@@ -230,7 +239,10 @@ const controller = {
   },
 
   showFollowingUsers: async (req, res) => {
-    const user = await UserModel.findOne({ username: req.params.username }, { __v: 0, hash: 0 }).lean();
+    const user = await UserModel.findOne(
+      { username: req.params.username },
+      { __v: 0, hash: 0 }
+    ).lean();
     if (!user) {
       return res.status(404).json();
     }
@@ -241,7 +253,6 @@ const controller = {
         { followee: 1 }
       ).populate({ path: 'followee', select: '-email -__v -hash' });
       return res.json(followingUsers);
-
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch followingUsers from database',
@@ -250,7 +261,10 @@ const controller = {
   },
 
   showFollowerUsers: async (req, res) => {
-    const user = await UserModel.findOne({ username: req.params.username }, { __v: 0, hash: 0 }).lean();
+    const user = await UserModel.findOne(
+      { username: req.params.username },
+      { __v: 0, hash: 0 }
+    ).lean();
     if (!user) {
       return res.status(404).json();
     }
@@ -261,7 +275,6 @@ const controller = {
         { follower: 1 }
       ).populate({ path: 'follower', select: '-email -__v -hash' });
       return res.json(followerUsers);
-
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch followingUsers from database',
@@ -289,7 +302,6 @@ const controller = {
         return res.status(201).json();
       }
       return res.status(204).json();
-
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to follow User',
@@ -343,9 +355,7 @@ const controller = {
       user.deleteOne();
 
       return res.status(200).json();
-
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         error: 'Failed to delete account',
       });

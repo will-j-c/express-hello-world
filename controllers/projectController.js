@@ -27,8 +27,7 @@ const getLogoUrl = async (photoUploaded, fileName) => {
     } else {
       return 'https://i.pinimg.com/564x/a9/d6/7e/a9d67e7c7c1f738141b3d728c31b2dd8.jpg';
     }
-  } catch (error) {
-  }
+  } catch (error) {}
 };
 
 const getProjectImageUrls = async (photosUploadedArr, fileName) => {
@@ -43,12 +42,13 @@ const getProjectImageUrls = async (photosUploadedArr, fileName) => {
       photosImageKit[i] = project_image.url;
     }
     return photosImageKit;
-  } catch (error) {
-  }
+  } catch (error) {}
 };
 
-const diffArray = (arr1, arr2) => {
-  return [...arr1, ...arr2].filter((v) => arr1.includes(v) !== arr2.includes(v));
+const diffArray = (oldData, deletedData) => {
+  return [...oldData, ...deletedData].filter(
+    (v) => oldData.includes(v) && !deletedData.includes(v)
+  );
 };
 
 const controller = {
@@ -56,7 +56,7 @@ const controller = {
     let projects = [];
     try {
       projects = await ProjectModel.aggregate([
-        { $match: {state: 'published'} },
+        { $match: { state: 'published' } },
         { $project: { _id: 0, user_id: 0, description: 0 } },
         { $sort: { updatedAt: -1 } },
       ]);
@@ -68,7 +68,7 @@ const controller = {
     res.status(200);
     return res.json(projects);
   },
-  
+
   createProject: async (req, res) => {
     if (req.files) {
       try {
@@ -122,7 +122,6 @@ const controller = {
       try {
         req.body.logo_url = await getLogoUrl(req.files, req.body.slug);
       } catch (error) {
-        console.log(error);
         return res.status(401).json({
           error: 'Failed to upload project logo',
         });
@@ -130,7 +129,6 @@ const controller = {
       try {
         newProjectImages = await getProjectImageUrls(req.files.image_urls, req.body.slug);
       } catch (error) {
-        console.log(error);
         return res.status(401).json({
           error: 'Failed to upload project Images',
         });
