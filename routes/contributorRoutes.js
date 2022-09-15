@@ -19,7 +19,7 @@ router.put(
 );
 router.post('/:id/apply', authMiddleware.isAuthenticated, controller.addApplicant);
 router.delete('/:id/withdraw', authMiddleware.isAuthenticated, controller.removeApplicant);
-router.get('/:id', controller.showOne);
+router.get('/:id', controller.show);
 router.delete(
   '/:id',
   authMiddleware.isAuthenticated,
@@ -27,7 +27,6 @@ router.delete(
   controller.delete
 );
 router.put('/:id', authMiddleware.isAuthenticated, authMiddleware.isAuthorized, controller.update);
-router.get('/', controller.showAll);
-router.post('/', authMiddleware.isAuthenticated, authMiddleware.isAuthorized, controller.add);
+router.get('/', controller.index);
 
 module.exports = router;
