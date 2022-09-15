@@ -51,6 +51,9 @@ const userAuth = {
       case 'projects':
         await projectsAuth();
         break;
+      case 'users':
+        usersAuth();
+        break;
       default:
         return next();
     }
@@ -85,7 +88,6 @@ const userAuth = {
     }
 
     async function contributorsAuth() {
-      let projectFilter = null;
       const contributor = await ContributorModel.findOne({ _id: req.params.id });
       const project = await ProjectModel.findById(contributor.project_id);
       if (project.user_id.toString() === user._id.toString()) {
@@ -95,6 +97,16 @@ const userAuth = {
       }
       return res.status(403).json({
         error: 'User is not authorized to change Contributor details for this project',
+      });
+    }
+
+    function usersAuth() {
+      if (req.authUser.username === req.params.username) {
+        req.userID = user._id;
+        return next();
+      }
+      return res.status(403).json({
+        error: 'User is not authorized',
       });
     }
   },
