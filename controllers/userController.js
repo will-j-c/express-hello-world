@@ -87,22 +87,6 @@ const controller = {
     }
   },
 
-  showUserProjectsDraft: async (req, res) => {
-    try {
-      const userProjectsDraft = await ProjectModel.aggregate([
-        { $match: { state: 'draft', user_id: req.userID } },
-        { $sort: { updatedAt: -1 } },
-        { $project: { __v: 0, user_id: 0, _id: 0 } },
-      ]);
-
-      return res.json(userProjectsDraft);
-    } catch (error) {
-      return res.status(500).json({
-        error: 'Failed to fetch draft projects of this user from database',
-      });
-    }
-  },
-
   showUserProjectsApplied: async (req, res) => {
     try {
       const appliedJobs = await ContributorRelationshipModel.find(
