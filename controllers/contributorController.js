@@ -107,10 +107,10 @@ const controller = {
       
       for await (const contributor of contributors) {
         const contributor_id = contributor._id;
-        const applicants = await RelationshipModel
+        const relations = await RelationshipModel
           .find({ contributor_id }, { _id: 0, __v: 0, contributor_id: 0 })
           .populate('user_id', { username: 1, _id: 0 })
-        contributor.applicants = applicants;
+        contributor.relations = relations;
       }
 
       return res.json(contributors);
