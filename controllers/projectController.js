@@ -7,6 +7,7 @@ const ContributorRelationshipsModel = require('../models/contributorsRelationshi
 const ProjectsRelationshipModel = require('../models/projectsRelationship');
 const projectValidationSchema = require('../validations/projectValidation');
 const ImageKit = require('imagekit');
+const res = require('express/lib/response');
 
 const imageKit = new ImageKit({
   publicKey: 'public_QbELL12FWyFW2r8fpAWMLY2t6j0=',
@@ -15,31 +16,39 @@ const imageKit = new ImageKit({
 });
 const getLogoUrl = async (photoUploaded, fileName) => {
   try {
-    const logo_from_multer = photoUploaded.logo_url[0];
-    const logo_from_imageKit = await imageKit.upload({
-      file: logo_from_multer.buffer,
-      fileName: `${fileName}-logo_url-${Date.now()}`,
-      folder: `helloworld/logo_url`,
-    });
-    return logo_from_imageKit.url;
-  } catch (error) {
-  }
+    if (photoUploaded?.logo_url) {
+      const logo_from_multer = photoUploaded.logo_url[0];
+      const logo_from_imageKit = await imageKit.upload({
+        file: logo_from_multer.buffer,
+        fileName: `${fileName}-logo_url-${Date.now()}`,
+        folder: `helloworld/logo_url`,
+      });
+      return logo_from_imageKit.url;
+    } else {
+      return 'https://i.pinimg.com/564x/a9/d6/7e/a9d67e7c7c1f738141b3d728c31b2dd8.jpg';
+    }
+  } catch (error) {}
 };
 
 const getProjectImageUrls = async (photosUploadedArr, fileName) => {
   try {
     let photosImageKit = [];
-    for (let i = 0, len = photosUploadedArr.length; i < len; i++) {
+    for (let i = 0, len = photosUploadedArr?.length; i < len; i++) {
       const project_image = await imageKit.upload({
-        file: photosUploadedArr[i].buffer,
+        file: photosUploadedArr[i]?.buffer,
         fileName: `${fileName}-image_urls-${Date.now()}`,
         folder: `helloworld/image_urls`,
       });
       photosImageKit[i] = project_image.url;
     }
     return photosImageKit;
-  } catch (error) {
-  }
+  } catch (error) {}
+};
+
+const diffArray = (oldData, deletedData) => {
+  return [...oldData, ...deletedData].filter(
+    (v) => oldData.includes(v) && !deletedData.includes(v)
+  );
 };
 
 const controller = {
@@ -47,7 +56,7 @@ const controller = {
     let projects = [];
     try {
       projects = await ProjectModel.aggregate([
-        { $match: {state: 'published'} },
+        { $match: { state: 'published' } },
         { $project: { _id: 0, user_id: 0, description: 0 } },
         { $sort: { updatedAt: -1 } },
       ]);
@@ -59,7 +68,7 @@ const controller = {
     res.status(200);
     return res.json(projects);
   },
-  
+
   createProject: async (req, res) => {
     if (req.files) {
       try {
@@ -76,6 +85,10 @@ const controller = {
           error: 'Failed to upload project Images',
         });
       }
+    } else {
+      //if user not input logo and project images, the value below will be add into database
+      req.body.logo_url = 'https://i.pinimg.com/564x/a9/d6/7e/a9d67e7c7c1f738141b3d728c31b2dd8.jpg';
+      req.body.image_urls = null;
     }
     //define projectOwner
     const projectOwner = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
@@ -102,7 +115,42 @@ const controller = {
   },
 
   editProject: async (req, res) => {
+    // check If user change project images and logo?
+    let newProjectImages = [];
+    const deletedProjectImages = req.body.deletedImages;
+    if (req.files) {
+      try {
+        req.body.logo_url = await getLogoUrl(req.files, req.body.slug);
+      } catch (error) {
+        return res.status(401).json({
+          error: 'Failed to upload project logo',
+        });
+      }
+      try {
+        newProjectImages = await getProjectImageUrls(req.files.image_urls, req.body.slug);
+      } catch (error) {
+        return res.status(401).json({
+          error: 'Failed to upload project Images',
+        });
+      }
+    }
+
+    const oldProjectData = await ProjectModel.findOne(
+      { slug: req.params.slug },
+      { image_urls: 1, _id: 0 }
+    );
+    const oldImages = oldProjectData?.image_urls;
+    //if user dont delete any image:
+    let oldImagesAfterDelete = oldImages;
+    //if user delete some images:
+    if (deletedProjectImages) {
+      oldImagesAfterDelete = diffArray(oldImages, deletedProjectImages);
+    }
+
+    req.body.image_urls = [...oldImagesAfterDelete, ...newProjectImages];
+    delete req.body.deletedImages;
     // Validations
+
     let validatedResults = null;
     try {
       validatedResults = await projectValidationSchema.edit.validateAsync(req.body);

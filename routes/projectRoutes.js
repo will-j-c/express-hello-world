@@ -33,6 +33,10 @@ router.put(
   '/:slug',
   authMiddleware.isAuthenticated,
   authMiddleware.isAuthorized,
+  upload.fields([
+    { name: 'logo_url', maxCount: 1 },
+    { name: 'image_urls', maxCount: 4 },
+  ]),
   projectController.editProject
 );
 router.delete(
