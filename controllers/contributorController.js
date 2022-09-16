@@ -11,9 +11,6 @@ const validSkills = require('../seeds/predefined-data/skills.json');
 const getData = async (username, contributorID) => {
   try {
     let user = await UserModel.findOne({ username });
-    // if (req.params.username) {
-    //   user = await UserModel.findOne({ username: req.params.username });
-    // }
     const contributor = await ContributorModel.findById(contributorID);
     const project = await ProjectModel.findOne({ _id: contributor?.project_id });
       const relation = await RelationshipModel.findOne({ 
@@ -95,6 +92,34 @@ const controller = {
       return res.status(404).json({
         error: 'Resource cannot be found',
       });
+    }
+  },
+
+  showByProject: async (req, res) => {
+    try {
+      const project = await ProjectModel.findOne({ slug: req.params.slug });
+      const project_id = project._id;
+      const contributors = await ContributorModel.aggregate([
+        { $match: { project_id } },
+        { $project: { project_id: 0, __v: 0 } },
+        { $sort: { updatedAt: -1 } },
+      ]);
+      
+      for await (const contributor of contributors) {
+        const contributor_id = contributor._id;
+        const relations = await RelationshipModel
+          .find({ contributor_id }, { _id: 0, __v: 0, contributor_id: 0 })
+          .populate('user_id', { username: 1, _id: 0 })
+        contributor.relations = relations;
+      }
+
+      return res.json(contributors);
+
+    } catch (error) {
+      console.log(error);
+      return res.status(404).json({
+        error: `Unable to find resource`,
+      })
     }
   },
 
