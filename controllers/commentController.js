@@ -106,6 +106,38 @@ const controller = {
       });
     }
   },
+  showProjectComments: async (req, res) => {
+    try {
+      const databaseCall = await callDatabase({
+        id: req.params.id,
+        slug: req.params.slug,
+        username: req.authUser.username,
+      });
+      const commentsPerPage = 10;
+      const skipNumber = req.query.page * commentsPerPage - commentsPerPage || 0;
+      const comments = await CommentModel.find(
+        { project_id: databaseCall.projectId },
+        { project_id: 0, _id: 0, createdAt: 0 }
+      )
+        .sort({ updatedAt: 'desc' })
+        .skip(skipNumber)
+        .limit(commentsPerPage)
+        .populate('user_id')
+        .lean();
+      const commentsToSend = comments.map((comment) => ({
+        userProfilePic: comment.user_id.profile_pic_url || null,
+        content: comment.content,
+        updatedAt: comment.updatedAt,
+        user_id: comment.user_id._id,
+      }));
+      console.log(commentsToSend);
+      return res.json();
+    } catch (error) {
+      return res.status(500).json({
+        error: 'Failed to fetch comments',
+      });
+    }
+  },
 };
 
 module.exports = controller;

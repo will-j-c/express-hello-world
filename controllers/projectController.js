@@ -201,7 +201,6 @@ const controller = {
   projectShow: async (req, res) => {
     let project = null;
     let createdBy = null;
-    let comments = null;
     let jobs = null;
     try {
       project = await ProjectModel.findOne({ slug: req.params.slug }, { __v: 0 }).lean();
@@ -210,20 +209,6 @@ const controller = {
         { _id: project.user_id },
         { username: 1, profile_pic_url: 1, _id: 0 }
       ).lean();
-      // Get comments TODO consolidate user details into comments
-      comments = await CommentModel.find(
-        { project_id: project._id },
-        { _id: 0, project_id: 0, __v: 0 }
-      ).lean();
-      for (let i = 0, len = comments.length; i < len; i += 1) {
-        // eslint-disable-next-line no-await-in-loop
-        const user = await UserModel.findOne(
-          { _id: comments[i].user_id },
-          { username: 1, profile_pic_url: 1, _id: 0 }
-        ).lean();
-        comments[i].createdBy = user;
-        delete comments[i].user_id;
-      }
       // Get jobs
       jobs = await ContributorModel.find(
         { project_id: project._id },
@@ -259,7 +244,7 @@ const controller = {
       });
     }
     res.status(200);
-    return res.json({ project, createdBy, comments, jobs });
+    return res.json({ project, createdBy, jobs });
   },
 
   followProject: async (req, res) => {

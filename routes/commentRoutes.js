@@ -5,6 +5,7 @@ const authMiddleware = require('../middlewares/userAuth');
 const router = express.Router();
 
 router.post('/:slug', authMiddleware.isAuthenticated, commentController.postComment);
+router.get('/:slug', authMiddleware.isAuthenticated, commentController.showProjectComments);
 router.put(
   '/:id',
   authMiddleware.isAuthenticated,
