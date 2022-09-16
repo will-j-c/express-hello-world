@@ -130,7 +130,7 @@ const controller = {
         updatedAt: comment.updatedAt,
         user_id: comment.user_id._id,
       }));
-      return res.json();
+      return res.json(commentsToSend);
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch comments',
