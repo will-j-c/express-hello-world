@@ -130,7 +130,6 @@ const controller = {
         updatedAt: comment.updatedAt,
         user_id: comment.user_id._id,
       }));
-      console.log(commentsToSend);
       return res.json();
     } catch (error) {
       return res.status(500).json({
