@@ -108,15 +108,13 @@ const controller = {
   },
   showProjectComments: async (req, res) => {
     try {
-      const databaseCall = await callDatabase({
-        id: req.params.id,
-        slug: req.params.slug,
-        username: req.authUser.username,
-      });
+      console.log('gets here');
+      console.log(req.params.slug);
+      const projectId = await ProjectModel.findOne({ slug: req.params.slug }, { _id: 1 });
       const commentsPerPage = 10;
       const skipNumber = req.query.page * commentsPerPage - commentsPerPage || 0;
       const comments = await CommentModel.find(
-        { project_id: databaseCall.projectId },
+        { project_id: projectId },
         { project_id: 0, _id: 0, createdAt: 0 }
       )
         .sort({ updatedAt: 'desc' })
@@ -130,6 +128,7 @@ const controller = {
         updatedAt: comment.updatedAt,
         user_id: comment.user_id._id,
       }));
+      console.log(commentsToSend);
       return res.json(commentsToSend);
     } catch (error) {
       return res.status(500).json({
