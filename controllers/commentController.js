@@ -108,8 +108,6 @@ const controller = {
   },
   showProjectComments: async (req, res) => {
     try {
-      console.log('gets here');
-      console.log(req.params.slug);
       const projectId = await ProjectModel.findOne({ slug: req.params.slug }, { _id: 1 });
       const commentsPerPage = 10;
       const skipNumber = req.query.page * commentsPerPage - commentsPerPage || 0;
@@ -128,7 +126,6 @@ const controller = {
         updatedAt: comment.updatedAt,
         user_id: comment.user_id._id,
       }));
-      console.log(commentsToSend);
       return res.json(commentsToSend);
     } catch (error) {
       return res.status(500).json({
