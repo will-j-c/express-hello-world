@@ -18,7 +18,7 @@ const createAccessToken = (username) => {
   );
 
   return accessToken;
-}
+};
 
 const controller = {
   register: async (req, res) => {
@@ -78,10 +78,8 @@ const controller = {
         <h1>Welcome to HelloWorld!</h1>
         <hr/>
         <h2>Let's verify your email</h2>
-        <p>https://localhost:${process.env.PORT || 8800}/api/v1/users/${activateToken}/activate</p>
-        <a href="https://localhost:${
-          process.env.PORT || 8800
-        }/api/v1/users/${activateToken}/activate"
+        <p>https://hello-world-zmw.netlify.app/api/v1/users/${activateToken}/activate</p>
+        <a href="https://hello-world-zmw.netlify.app/api/v1/users/${activateToken}/activate"
           <button>Verify</button>
         </a>
       `,
@@ -145,7 +143,6 @@ const controller = {
   },
 
   refresh: async (req, res) => {
-
     try {
       // get the refresh token from request body
       const { refreshToken } = req.body;
