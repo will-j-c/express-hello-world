@@ -40,32 +40,10 @@ const controller = {
       // note: unsure the implementation on FE
       // hence currently returning all data (in case need for filtering, etc)
       // can add $projects later on once FE implemnentation is confirmed
-      const contributors = await ContributorModel.aggregate([
-        { $match: filters },
-        { $sort: { updatedAt: -1 } },
-      ]);
-
-      const projectIDsData = await ContributorModel.aggregate([
-        { $match: filters },
-        { $project: { _id: 0, project_id: 1 } },
-      ]);
-
-      const projectIDs = [];
-
-      projectIDsData.forEach((e) => {
-        const id = e.project_id;
-        if (!projectIDs.includes(id)) {
-          projectIDs.push(id);
-        }
-      });
-
-      // get projects
-      // currently returning title, slug, tagline, logo
-      // can adjust later depending on FE implementation
-      projects = await ProjectModel.find(
-        { _id: { $in: projectIDs } },
-        { _id: 0, title: 1, slug: 1, tagline: 1, logo_url: 1 }
-      );
+      const contributors = await ContributorModel
+        .find({ filters }, { __v: 0 })
+        .populate('project_id', { _id: 0, title: 1, slug: 1, tagline: 1, logo_url: 1 })
+      ;
 
       // for consideration later: do we also want to pull contributorRelationships
 
