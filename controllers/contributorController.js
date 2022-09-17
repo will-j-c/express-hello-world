@@ -36,7 +36,6 @@ const controller = {
     try {
       // not sure but may need to apply filters based on req.query in future
       const filters = {};
-      let projects = [];
       // note: unsure the implementation on FE
       // hence currently returning all data (in case need for filtering, etc)
       // can add $projects later on once FE implemnentation is confirmed
@@ -47,7 +46,7 @@ const controller = {
 
       // for consideration later: do we also want to pull contributorRelationships
 
-      return res.json({ contributors, projects });
+      return res.json(contributors);
 
     } catch (error) {
       return res.status(500).json({
