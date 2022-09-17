@@ -11,8 +11,7 @@ const RefreshTokenModel = require('../models/refreshTokenModel');
 const createAccessToken = (username) => {
   const accessToken = jwt.sign(
     {
-      // TO DO: change token expiry to a longer period (currently 1 hr)
-      exp: Math.floor(Date.now() / 1000) + 60 * 60,
+      exp: Math.floor(Date.now() / 1000) + 60 * 5,
       data: { username },
     },
     process.env.JWT_SECRET_ACCESS
