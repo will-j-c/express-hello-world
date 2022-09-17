@@ -108,15 +108,16 @@ const controller = {
   },
   showProjectComments: async (req, res) => {
     try {
-      const databaseCall = await callDatabase({
-        id: req.params.id,
-        slug: req.params.slug,
-        username: req.authUser.username,
-      });
-      const commentsPerPage = 10;
+      const projectId = await ProjectModel.findOne({ slug: req.params.slug }, { _id: 1 });
+      const commentsPerPage = 5;
       const skipNumber = req.query.page * commentsPerPage - commentsPerPage || 0;
+      let commentCount = await CommentModel.find(
+        { project_id: projectId },
+        { project_id: 0, _id: 0, createdAt: 0 }
+      ).lean();
+      commentCount = commentCount.length;
       const comments = await CommentModel.find(
-        { project_id: databaseCall.projectId },
+        { project_id: projectId },
         { project_id: 0, _id: 0, createdAt: 0 }
       )
         .sort({ updatedAt: 'desc' })
@@ -129,8 +130,9 @@ const controller = {
         content: comment.content,
         updatedAt: comment.updatedAt,
         user_id: comment.user_id._id,
+        username: comment.user_id.username,
       }));
-      return res.json();
+      return res.json({ commentCount, commentsToSend });
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch comments',
