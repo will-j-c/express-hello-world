@@ -6,6 +6,19 @@ sgMail.setApiKey(process.env.SENDGRID_APIKEY);
 
 const UserModel = require('../models/userModel');
 const UserValidator = require('../validations/userValidation');
+const RefreshTokenModel = require('../models/refreshTokenModel');
+
+const createAccessToken = (username) => {
+  const accessToken = jwt.sign(
+    {
+      exp: Math.floor(Date.now() / 1000) + 60 * 5,
+      data: { username },
+    },
+    process.env.JWT_SECRET_ACCESS
+  );
+
+  return accessToken;
+}
 
 const controller = {
   register: async (req, res) => {
@@ -112,16 +125,65 @@ const controller = {
       return res.status(401).json({ error: errMsg });
     }
 
-    const accessToken = jwt.sign(
+    const accessToken = createAccessToken(user.username);
+
+    const refreshToken = jwt.sign(
       {
-        // TO DO: change token expiry to a longer period (currently 1 hr)
-        exp: Math.floor(Date.now() / 1000) + 60 * 60,
+        // Refresh token expiring in 1 hr
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
         data: { username: user.username },
       },
-      process.env.JWT_SECRET_ACCESS
+      process.env.JWT_SECRET_REFRESH
     );
 
-    return res.json({ accessToken });
+    // store refresh token in database
+    await RefreshTokenModel.create({
+      token: refreshToken,
+    });
+
+    return res.json({ accessToken, refreshToken });
+  },
+
+  refresh: async (req, res) => {
+
+    try {
+      // get the refresh token from request body
+      const { refreshToken } = req.body;
+      const token = await RefreshTokenModel.findOne({ token: refreshToken });
+      if (!token) {
+        return res.status(401).json({
+          error: 'Unable to verify refresh token',
+        });
+      }
+
+      const verified = jwt.verify(refreshToken, process.env.JWT_SECRET_REFRESH);
+      if (verified) {
+        // create new accessToken if refreshToken is verified
+        const accessToken = createAccessToken(verified.data.username);
+
+        return res.json({ accessToken });
+      }
+
+      return res.json({ accessToken: 'abcd' });
+    } catch (err) {
+      return res.status(401).json({
+        error: 'Unable to verify refresh token',
+      });
+    }
+  },
+
+  logout: async (req, res) => {
+    try {
+      const { refreshToken } = req.body;
+      await RefreshTokenModel.findOneAndDelete({ token: refreshToken });
+      return res.json({
+        message: 'Refresh Token deleted successfully',
+      });
+    } catch (err) {
+      return res.status(409).json({
+        error: 'Unable to remove refresh token',
+      });
+    }
   },
 };
 
