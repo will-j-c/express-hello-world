@@ -39,7 +39,6 @@ const userAuth = {
 
   isAuthorized: async (req, res, next) => {
     const route = req.baseUrl.split('/').pop();
-
     const user = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
 
     switch (route) {
@@ -51,6 +50,9 @@ const userAuth = {
         break;
       case 'projects':
         await projectsAuth();
+        break;
+      case 'users':
+        usersAuth();
         break;
       default:
         return next();
@@ -77,22 +79,17 @@ const userAuth = {
         });
       }
       const project = await ProjectModel.findOne({ slug: req.params.slug }, { user_id: 1, _id: 0 });
-      if (project.user_id.toString() === user._id.toString()) {
+      if (project?.user_id.toString() === user?._id.toString()) {
         return next();
       }
       return res.status(403).json({
         error: 'User is not authorized to change Project details for this project',
       });
     }
+
     async function contributorsAuth() {
-      let projectFilter = null;
       const contributor = await ContributorModel.findOne({ _id: req.params.id });
-      if (req.body.project_slug) {
-        projectFilter = { slug: req.body.project_slug };
-      } else if (contributor) {
-        projectFilter = { _id: contributor.project_id };
-      }
-      const project = await ProjectModel.findOne(projectFilter);
+      const project = await ProjectModel.findById(contributor.project_id);
       if (project.user_id.toString() === user._id.toString()) {
         req.contributorID = contributor?._id;
         req.projectID = project._id;
@@ -100,6 +97,16 @@ const userAuth = {
       }
       return res.status(403).json({
         error: 'User is not authorized to change Contributor details for this project',
+      });
+    }
+
+    function usersAuth() {
+      if (req.authUser.username === req.params.username) {
+        req.userID = user._id;
+        return next();
+      }
+      return res.status(403).json({
+        error: 'User is not authorized',
       });
     }
   },
