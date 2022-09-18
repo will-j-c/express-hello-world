@@ -390,7 +390,7 @@ const controller = {
         .find({ user_id }, { __v: 0, user_id: 0, _id: 0 })
         .populate({
           path: 'contributor_id',
-          select: '-_id -__v',
+          select: '-__v',
           populate: {
             path: 'project_id',
             select: '-_id slug title',
