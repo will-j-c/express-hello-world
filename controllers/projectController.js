@@ -88,12 +88,13 @@ const controller = {
     } else {
       //if user not input logo and project images, the value below will be add into database
       req.body.logo_url = 'https://i.pinimg.com/564x/a9/d6/7e/a9d67e7c7c1f738141b3d728c31b2dd8.jpg';
-      req.body.image_urls = null;
+      req.body.image_urls = [];
     }
     //define projectOwner
     const projectOwner = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
     req.body.user_id = projectOwner?._id.toString();
-
+    delete req.body.username;
+    delete req.body.step;
     // Validations
     let validatedResults = null;
     try {
