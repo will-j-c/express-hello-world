@@ -7,7 +7,6 @@ const ContributorRelationshipsModel = require('../models/contributorsRelationshi
 const ProjectsRelationshipModel = require('../models/projectsRelationship');
 const projectValidationSchema = require('../validations/projectValidation');
 const ImageKit = require('imagekit');
-const res = require('express/lib/response');
 
 const imageKit = new ImageKit({
   publicKey: 'public_QbELL12FWyFW2r8fpAWMLY2t6j0=',
@@ -68,8 +67,8 @@ const controller = {
     res.status(200);
     return res.json(projects);
   },
-
-  createProject: async (req, res) => {
+  
+  uploadPhotos: async (req, res) => {
     if (req.files) {
       try {
         req.body.logo_url = await getLogoUrl(req.files, req.body.slug);
@@ -90,29 +89,44 @@ const controller = {
       req.body.logo_url = 'https://i.pinimg.com/564x/a9/d6/7e/a9d67e7c7c1f738141b3d728c31b2dd8.jpg';
       req.body.image_urls = [];
     }
+    try {
+      await ProjectModel.findOneAndUpdate({ slug: req.query.slug }, req.body);
+      return res.status(201).json();
+    } catch (error) {
+      return res.status(500).json({
+        error: 'Failed to upload photos',
+      });
+    }
+  },
+
+  createProject: async (req, res) => {
     //define projectOwner
     const projectOwner = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
     req.body.user_id = projectOwner?._id.toString();
     // Delete fields not required in create action
     delete req.body.username;
     delete req.body.step;
+    delete req.body.image_urls;
+    delete req.body.logo_url;
     // Validations
     let validatedResults = null;
-    try {
-      validatedResults = await projectValidationSchema.create.validateAsync(req.body);
-    } catch (error) {
-      return res.status(400).json({
-        error: 'Validation failed',
-      });
-    }
-    // Create new document
-    try {
-      const project = await ProjectModel.create(validatedResults);
-      return res.status(201).json({slug: project.slug});
-    } catch (error) {
-      return res.status(500).json({
-        error: 'Failed to create project',
-      });
+    if (req.headers['content-type'] === 'application/json') {
+      try {
+        validatedResults = await projectValidationSchema.create.validateAsync(req.body);
+      } catch (error) {
+        return res.status(400).json({
+          error: 'Validation failed',
+        });
+      }
+      // Create new document
+      try {
+        const project = await ProjectModel.create(validatedResults);
+        return res.status(201).json({ slug: project.slug });
+      } catch (error) {
+        return res.status(500).json({
+          error: 'Failed to create project',
+        });
+      }
     }
   },
 
