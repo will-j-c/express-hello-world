@@ -47,15 +47,16 @@ router.delete(
   authMiddleware.isAuthorized,
   projectController.deleteProject
 );
-router.get('/', projectController.showAllProjects);
 router.post(
-  '/',
+  '/upload',
   authMiddleware.isAuthenticated,
   upload.fields([
     { name: 'logo_url', maxCount: 1 },
     { name: 'image_urls', maxCount: 4 },
   ]),
-  projectController.createProject
+  projectController.uploadPhotos
 );
+router.get('/', projectController.showAllProjects);
+router.post('/', authMiddleware.isAuthenticated, projectController.createProject);
 
 module.exports = router;
