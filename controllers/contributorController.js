@@ -60,7 +60,11 @@ const controller = {
       const { id } = req.params;
       const contributor = await ContributorModel
         .findOne({ _id: id }, { __v: 0 })
-        .populate('project_id', { _id: 0, title: 1, slug: 1, tagline: 1, logo_url: 1 })
+        .populate({
+          path: 'project_id', 
+          select: '-_id user_id title slug logo_url',
+          populate: { path: 'user_id', select: '-_id username' },
+        })
 
       const relations = await RelationshipModel
         .find({ contributor_id: id }, { __v: 0, _id: 0, contributor_id: 0 })
@@ -95,7 +99,6 @@ const controller = {
       return res.json(contributors);
 
     } catch (error) {
-      console.log(error);
       return res.status(404).json({
         error: `Unable to find resource`,
       })
