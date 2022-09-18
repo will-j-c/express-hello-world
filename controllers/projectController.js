@@ -88,12 +88,14 @@ const controller = {
     } else {
       //if user not input logo and project images, the value below will be add into database
       req.body.logo_url = 'https://i.pinimg.com/564x/a9/d6/7e/a9d67e7c7c1f738141b3d728c31b2dd8.jpg';
-      req.body.image_urls = null;
+      req.body.image_urls = [];
     }
     //define projectOwner
     const projectOwner = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
     req.body.user_id = projectOwner?._id.toString();
-
+    // Delete fields not required in create action
+    delete req.body.username;
+    delete req.body.step;
     // Validations
     let validatedResults = null;
     try {
@@ -105,13 +107,13 @@ const controller = {
     }
     // Create new document
     try {
-      await ProjectModel.create(validatedResults);
+      const project = await ProjectModel.create(validatedResults);
+      return res.status(201).json({slug: project.slug});
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to create project',
       });
     }
-    return res.status(201).json();
   },
 
   editProject: async (req, res) => {
