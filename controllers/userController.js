@@ -381,5 +381,27 @@ const controller = {
       });
     }
   },
+
+  showApplications: async (req, res) => {
+    try {
+      const user = await UserModel.findOne({username: req.params.username});
+      const user_id = user._id;
+      const applications = await ContributorRelationshipModel
+        .find({ user_id }, { __v: 0, user_id: 0, _id: 0 })
+        .populate({
+          path: 'contributor_id',
+          select: '-__v',
+          populate: {
+            path: 'project_id',
+            select: '-_id slug title',
+          }
+        })
+      return res.json(applications);
+    } catch (error) {
+      return res.status(500).json({
+        error: 'Failed to fetch data',
+      });
+    }
+  },
 };
 module.exports = controller;

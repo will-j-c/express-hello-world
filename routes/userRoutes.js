@@ -9,6 +9,12 @@ const router = express.Router();
 
 router.get('/', userController.showAllUsers);
 router.post('/:token/activate', userController.activateAccount);
+router.get(
+  '/:username/applications',
+  userAuth.isAuthenticated,
+  userAuth.isAuthorized,
+  userController.showApplications
+);
 router.get('/:username/following', userController.showFollowingUsers);
 router.get('/:username/followers', userController.showFollowerUsers);
 router.post('/:username/follow', userAuth.isAuthenticated, userController.followUser);
