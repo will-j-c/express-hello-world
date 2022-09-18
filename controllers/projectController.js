@@ -93,6 +93,7 @@ const controller = {
     //define projectOwner
     const projectOwner = await UserModel.findOne({ username: req.authUser.username }, { _id: 1 });
     req.body.user_id = projectOwner?._id.toString();
+    // Delete fields not required in create action
     delete req.body.username;
     delete req.body.step;
     // Validations
@@ -106,13 +107,13 @@ const controller = {
     }
     // Create new document
     try {
-      await ProjectModel.create(validatedResults);
+      const project = await ProjectModel.create(validatedResults);
+      return res.status(201).json({slug: project.slug});
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to create project',
       });
     }
-    return res.status(201).json();
   },
 
   editProject: async (req, res) => {
