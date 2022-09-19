@@ -90,9 +90,11 @@ const controller = {
       req.body.image_urls = [];
     }
     try {
+      console.log(req.body)
       await ProjectModel.findOneAndUpdate({ slug: req.query.slug }, req.body);
       return res.status(201).json();
     } catch (error) {
+      console.log(error)
       return res.status(500).json({
         error: 'Failed to upload photos',
       });
@@ -114,6 +116,7 @@ const controller = {
       try {
         validatedResults = await projectValidationSchema.create.validateAsync(req.body);
       } catch (error) {
+        console.log(error)
         return res.status(400).json({
           error: 'Validation failed',
         });

@@ -10,7 +10,7 @@ const projectValidationSchema = {
     tagline: Joi.string(),
     categories: Joi.array().items(Joi.string()),
     state: Joi.string(),
-    description: Joi.string(),
+    description: Joi.string().min(0),
     image_urls: Joi.array().items(Joi.string()),
   }),
   edit: Joi.object({
