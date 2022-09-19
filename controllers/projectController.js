@@ -52,20 +52,21 @@ const diffArray = (oldData, deletedData) => {
 
 const controller = {
   showAllProjects: async (req, res) => {
-    let projects = [];
     try {
-      projects = await ProjectModel.aggregate([
-        { $match: { state: 'published' } },
-        { $project: { _id: 0, user_id: 0, description: 0 } },
-        { $sort: { updatedAt: -1 } },
-      ]);
+      const projects = await ProjectModel
+        .find({ state: 'published' }, { __v: 0, _id: 0, description: 0 })
+        .sort({ updatedAt: 'desc' })
+        .populate({
+          path: 'user_id',
+          select: '-_id username'
+        })
+
+      return res.json(projects);
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch projects from database',
       });
     }
-    res.status(200);
-    return res.json(projects);
   },
   
   uploadPhotos: async (req, res) => {
