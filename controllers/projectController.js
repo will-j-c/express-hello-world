@@ -13,6 +13,7 @@ const imageKit = new ImageKit({
   privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
   urlEndpoint: 'https://ik.imagekit.io/wu6yrdrjf/',
 });
+
 const getLogoUrl = async (photoUploaded, fileName) => {
   try {
     if (photoUploaded?.logo_url) {
@@ -52,16 +53,38 @@ const diffArray = (oldData, deletedData) => {
 
 const controller = {
   showAllProjects: async (req, res) => {
+    const categoriesFilter = req.query?.categories?.replaceAll('-', ' ').split(',');
     try {
-      const projects = await ProjectModel
-        .find({ state: 'published' }, { __v: 0, _id: 0, description: 0 })
+      let projects = null;
+      if (!categoriesFilter) {
+        projects = await ProjectModel
+        .find(
+          { 
+            state: 'published',
+          }, 
+          { __v: 0, _id: 0, description: 0 })
         .sort({ updatedAt: 'desc' })
         .populate({
           path: 'user_id',
           select: '-_id username'
         })
-
+      } else {
+        projects = await ProjectModel
+        .find(
+          { 
+            state: 'published',
+            categories: {$in : categoriesFilter}
+          }, 
+          { __v: 0, _id: 0, description: 0 })
+        .sort({ updatedAt: 'desc' })
+        .populate({
+          path: 'user_id',
+          select: '-_id username'
+        })
+      }
+      
       return res.json(projects);
+
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch projects from database',
