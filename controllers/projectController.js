@@ -16,13 +16,17 @@ const imageKit = new ImageKit({
 
 const getLogoUrl = async (photoUploaded, fileName) => {
   try {
-    if (photoUploaded?.logo_url) {
-      const logo_from_multer = photoUploaded.logo_url[0];
+    if (photoUploaded) {
+      console.log('hitting line 20');
+      console.log('getLogoUrl: ', photoUploaded[0]);
+      const logo_from_multer = photoUploaded[0]; //.logo_url[0];
+      console.log(logo_from_multer);
       const logo_from_imageKit = await imageKit.upload({
         file: logo_from_multer.buffer,
         fileName: `${fileName}-logo_url-${Date.now()}`,
         folder: `helloworld/logo_url`,
       });
+      console.log();
       return logo_from_imageKit.url;
     } else {
       return 'https://i.pinimg.com/564x/a9/d6/7e/a9d67e7c7c1f738141b3d728c31b2dd8.jpg';
@@ -31,6 +35,8 @@ const getLogoUrl = async (photoUploaded, fileName) => {
 };
 
 const getProjectImageUrls = async (photosUploadedArr, fileName) => {
+  console.log('hitting line 37');
+  console.log(photosUploadedArr);
   try {
     let photosImageKit = [];
     for (let i = 0, len = photosUploadedArr?.length; i < len; i++) {
@@ -57,65 +63,65 @@ const controller = {
     try {
       let projects = null;
       if (!categoriesFilter) {
-        projects = await ProjectModel
-        .find(
-          { 
+        projects = await ProjectModel.find(
+          {
             state: 'published',
-          }, 
-          { __v: 0, _id: 0, description: 0 })
-        .sort({ updatedAt: 'desc' })
-        .populate({
-          path: 'user_id',
-          select: '-_id username'
-        })
+          },
+          { __v: 0, _id: 0, description: 0 }
+        )
+          .sort({ updatedAt: 'desc' })
+          .populate({
+            path: 'user_id',
+            select: '-_id username',
+          });
       } else {
-        projects = await ProjectModel
-        .find(
-          { 
+        projects = await ProjectModel.find(
+          {
             state: 'published',
-            categories: {$in : categoriesFilter}
-          }, 
-          { __v: 0, _id: 0, description: 0 })
-        .sort({ updatedAt: 'desc' })
-        .populate({
-          path: 'user_id',
-          select: '-_id username'
-        })
+            categories: { $in: categoriesFilter },
+          },
+          { __v: 0, _id: 0, description: 0 }
+        )
+          .sort({ updatedAt: 'desc' })
+          .populate({
+            path: 'user_id',
+            select: '-_id username',
+          });
       }
-      
-      return res.json(projects);
 
+      return res.json(projects);
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to fetch projects from database',
       });
     }
   },
-  
+
   uploadPhotos: async (req, res) => {
-    if (req.files) {
+    console.log('req.files: ', req.files.image_urls);
+    if (req.files.logo_url) {
       try {
-        req.body.logo_url = await getLogoUrl(req.files, req.body.slug);
+        req.body.logo_url = await getLogoUrl(req.files.logo_url, req.query.slug);
+        console.log('req.body.logo_url', req.body.logo_url);
       } catch (error) {
         return res.status(401).json({
           error: 'Failed to upload project logo',
         });
       }
+    }
+    if (req.files.image_urls) {
       try {
-        req.body.image_urls = await getProjectImageUrls(req.files.image_urls, req.body.slug);
+        req.body.image_urls = await getProjectImageUrls(req.files.image_urls, req.query.slug);
+        console.log('req.body.image_urls', req.body.image_urls);
       } catch (error) {
         return res.status(401).json({
           error: 'Failed to upload project Images',
         });
       }
-    } else {
-      //if user not input logo and project images, the value below will be add into database
-      req.body.logo_url = 'https://i.pinimg.com/564x/a9/d6/7e/a9d67e7c7c1f738141b3d728c31b2dd8.jpg';
-      req.body.image_urls = [];
     }
     try {
       await ProjectModel.findOneAndUpdate({ slug: req.query.slug }, req.body);
-      return res.status(201).json();
+      return res.status(201).json(req.body);
     } catch (error) {
       return res.status(500).json({
         error: 'Failed to upload photos',
@@ -130,14 +136,17 @@ const controller = {
     // Delete fields not required in create action
     delete req.body.username;
     delete req.body.step;
-    delete req.body.image_urls;
-    delete req.body.logo_url;
+    delete req.body?.image_urls;
+    delete req.body?.logo_url;
+    delete req.body?.image_urls_files;
+    delete req.body?.logo_url_files;
     // Validations
     let validatedResults = null;
     if (req.headers['content-type'] === 'application/json') {
       try {
         validatedResults = await projectValidationSchema.create.validateAsync(req.body);
       } catch (error) {
+        console.log(error);
         return res.status(400).json({
           error: 'Validation failed',
         });
@@ -153,34 +162,40 @@ const controller = {
       }
     }
   },
-
-  editProject: async (req, res) => {
+  editImages: async (req, res) => {
     // check If user change project images and logo?
     let newProjectImages = [];
     const deletedProjectImages = req.body.deletedImages;
-    if (req.files) {
+    if (req.files?.logo_url) {
       try {
-        req.body.logo_url = await getLogoUrl(req.files, req.body.slug);
+        req.body.logo_url = await getLogoUrl(req.files.logo_url, req.body.slug);
+        await ProjectModel.findOneAndUpdate(
+          { slug: req.params.slug },
+          { logo_url: req.body.logo_url }
+        );
       } catch (error) {
         return res.status(401).json({
           error: 'Failed to upload project logo',
         });
       }
+    }
+    if (req.files?.image_urls) {
       try {
         newProjectImages = await getProjectImageUrls(req.files.image_urls, req.body.slug);
+        console.log(newProjectImages)
       } catch (error) {
+        console.log(error);
         return res.status(401).json({
           error: 'Failed to upload project Images',
         });
       }
     }
-
     const oldProjectData = await ProjectModel.findOne(
       { slug: req.params.slug },
       { image_urls: 1, _id: 0 }
     );
     const oldImages = oldProjectData?.image_urls;
-    //if user dont delete any image:
+    //if user don't delete any image:
     let oldImagesAfterDelete = oldImages;
     //if user delete some images:
     if (deletedProjectImages) {
@@ -189,12 +204,20 @@ const controller = {
 
     req.body.image_urls = [...oldImagesAfterDelete, ...newProjectImages];
     delete req.body.deletedImages;
-    // Validations
+    return res.status(200).json({ image_urls: req.body.image_urls });
+  },
 
+  editProject: async (req, res) => {
+    // Validations
     let validatedResults = null;
+    delete req.body.step;
+    delete req.body.username;
+    delete req.body?.logo_url_files;
+    delete req.body?.image_urls_files;
     try {
       validatedResults = await projectValidationSchema.edit.validateAsync(req.body);
     } catch (error) {
+      console.log(error);
       return res.status(400).json({
         error: 'Validation failed',
       });
@@ -202,8 +225,9 @@ const controller = {
     // Find and update the document
     try {
       await ProjectModel.findOneAndUpdate({ slug: req.params.slug }, validatedResults);
-      return res.status(201).json();
+      return res.status(201).json({ slug: req.params.slug });
     } catch (error) {
+      console.log(error);
       return res.status(500).json({
         error: 'Failed to edit project',
       });

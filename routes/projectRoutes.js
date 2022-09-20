@@ -47,6 +47,15 @@ router.delete(
   authMiddleware.isAuthorized,
   projectController.deleteProject
 );
+router.put(
+  '/:slug/upload',
+  authMiddleware.isAuthenticated,
+  upload.fields([
+    { name: 'logo_url', maxCount: 1 },
+    { name: 'image_urls', maxCount: 4 },
+  ]),
+  projectController.editImages
+);
 router.post(
   '/upload',
   authMiddleware.isAuthenticated,
