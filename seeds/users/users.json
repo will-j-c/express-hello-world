@@ -17,6 +17,7 @@
     "email": "steve@test.com",
     "hash": "steve123",
     "about": "Random villager noises... Creeper goes BOOOOM",
+    "tagline": "Experienced FullStack Dev",
     "socmed": {
       "github": "https://github.com/ZoeNguyen73",
       "faceboook": "https://www.facebook.com/"
@@ -28,6 +29,7 @@
     "username": "mcspicy",
     "email": "mcspicy@test.com",
     "hash": "mcspicy123",
+    "tagline": "Passionate about food",
     "about": "McSpicy is my passion. I'm lovin' it!!!!!",
     "skills": ["Product Management", "UI/UX Design", "HTML/CSS", "Content Writing"],
     "interests": ["McSpicy", "McNuggets", "Shaker Fries", "Fillet O Fish"],
@@ -37,6 +39,7 @@
   {
     "name": "Zoe ZZZ",
     "username": "zoe",
+    "tagline": "Aspiring Software Engineer",
     "email": "zoe@test.com",
     "hash": "zoe123"
   },
