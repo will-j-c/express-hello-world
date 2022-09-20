@@ -22,6 +22,9 @@ const userSchema = new mongoose.Schema({
   tagline: {
     type: String,
   },
+  about: {
+    type: String,
+  },
   skills: {
     type: Array, // Array of String: ["skill", "skills", "skill"]
   },
