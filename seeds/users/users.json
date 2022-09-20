@@ -2,8 +2,11 @@
   {
     "name": "Harold HideThePain",
     "username": "harold",
+    "about": "You know the meme - it's me! I embody pain, I do. You know what day say - No pain no gain!",
     "email": "harold@test.com",
     "hash": "harold123",
+    "skills": ["JavaScript", "Full Stack", "MERN", "MEAN", "React", "HTML/CSS", "Vue"],
+    "interests": ["Dota", "Travel", "Hiphop", "Chess", "Reading"],
     "tagline": "permanently in pain",
     "profile_pic_url": "https://i.kym-cdn.com/entries/icons/mobile/000/016/546/hidethepainharold.jpg"
   },
@@ -13,6 +16,8 @@
     "username": "steve",
     "email": "steve@test.com",
     "hash": "steve123",
+    "about": "Random villager noises... Creeper goes BOOOOM",
+    "tagline": "Experienced FullStack Dev",
     "socmed": {
       "github": "https://github.com/ZoeNguyen73",
       "faceboook": "https://www.facebook.com/"
@@ -24,12 +29,17 @@
     "username": "mcspicy",
     "email": "mcspicy@test.com",
     "hash": "mcspicy123",
+    "tagline": "Passionate about food",
+    "about": "McSpicy is my passion. I'm lovin' it!!!!!",
+    "skills": ["Product Management", "UI/UX Design", "HTML/CSS", "Content Writing"],
+    "interests": ["McSpicy", "McNuggets", "Shaker Fries", "Fillet O Fish"],
     "profile_pic_url": "https://live.staticflickr.com/1793/42886147132_aa26ab9979_n.jpg"
   },
 
   {
     "name": "Zoe ZZZ",
     "username": "zoe",
+    "tagline": "Aspiring Software Engineer",
     "email": "zoe@test.com",
     "hash": "zoe123"
   },
@@ -37,6 +47,8 @@
   {
     "name": "Fluffy Llama",
     "username": "llama",
+    "skills": ["Digital Marketing"],
+    "interests": ["Grass and things like grass"],
     "email": "llama@test.com",
     "hash": "llama123",
     "tagline": "bahhhhhhh"

@@ -41,7 +41,11 @@ const controller = {
       // can add $projects later on once FE implemnentation is confirmed
       const contributors = await ContributorModel
         .find({ filters }, { __v: 0 })
-        .populate('project_id', { _id: 0, title: 1, slug: 1, tagline: 1, logo_url: 1 })
+        .populate({
+          path: 'project_id', 
+          select: '-_id user_id title slug logo_url',
+          populate: { path: 'user_id', select: '-_id username' },
+        })
       ;
 
       // for consideration later: do we also want to pull contributorRelationships
@@ -112,7 +116,7 @@ const controller = {
       data = await validator.details.validateAsync(req.body);
     } catch (error) {
       return res.status(400).json({
-        error: 'Invalid input',
+        error: error.message,
       });
     }
 
