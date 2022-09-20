@@ -112,7 +112,7 @@ const controller = {
       data = await validator.details.validateAsync(req.body);
     } catch (error) {
       return res.status(400).json({
-        error: 'Invalid input',
+        error: error.message,
       });
     }
 
