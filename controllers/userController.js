@@ -205,8 +205,7 @@ const controller = {
       twitter,
     };
     //remove the empty attribute from socmedFormat
-    const socmed = Object.fromEntries(Object.entries(socmedFormat).filter(([_, v]) => v != ''));
-
+    const socmed = Object.fromEntries(Object.entries(socmedFormat).filter(([_, v]) => !!v));
     //handle skills:
     const validatedSkills = req.body.skills?.filter((skill) => validSkills.includes(skill));
     const skills = validatedSkills;
