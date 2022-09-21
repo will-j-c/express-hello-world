@@ -28,7 +28,7 @@ app.use('/api/v1/data/', dataRouter);
 
 app.listen(port, async () => {
   try {
-    await mongoose.connect(process.env.MONGO_DB_STRING, { dbName: 'hello-world-4' });
+    await mongoose.connect(process.env.MONGO_DB_STRING, { dbName: 'hello-world' });
   } catch (error) {
     console.log(`====>Failed to connect to DB<==== Error: ${error}`);
     process.exit(1);
