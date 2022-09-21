@@ -41,7 +41,11 @@ const controller = {
       // can add $projects later on once FE implemnentation is confirmed
       const contributors = await ContributorModel
         .find({ filters }, { __v: 0 })
-        .populate('project_id', { _id: 0, title: 1, slug: 1, tagline: 1, logo_url: 1 })
+        .populate({
+          path: 'project_id', 
+          select: '-_id user_id title slug logo_url',
+          populate: { path: 'user_id', select: '-_id username' },
+        })
       ;
 
       // for consideration later: do we also want to pull contributorRelationships
@@ -58,13 +62,19 @@ const controller = {
   show: async (req, res) => {
     try {
       const { id } = req.params;
-      const contributor = await ContributorModel.findOne({ _id: id });
-      const project = await ProjectModel.findOne(
-        { _id: contributor.project_id },
-        { _id: 0, title: 1, slug: 1, tagline: 1, logo_url: 1 }
-      );
-      const relations = await RelationshipModel.find({ contributor_id: id });
-      return res.json({ contributor, project, relations });
+      const contributor = await ContributorModel
+        .findOne({ _id: id }, { __v: 0 })
+        .populate({
+          path: 'project_id', 
+          select: '-_id user_id title slug logo_url',
+          populate: { path: 'user_id', select: '-_id username' },
+        })
+
+      const relations = await RelationshipModel
+        .find({ contributor_id: id }, { __v: 0, _id: 0, contributor_id: 0 })
+        .populate('user_id', { __v: 0, _id: 0, email: 0, hash: 0, skills: 0, interests: 0, socmed: 0, tagline: 0 })
+
+      return res.json({ contributor, relations });
     } catch (error) {
       return res.status(404).json({
         error: 'Resource cannot be found',
@@ -93,7 +103,6 @@ const controller = {
       return res.json(contributors);
 
     } catch (error) {
-      console.log(error);
       return res.status(404).json({
         error: `Unable to find resource`,
       })
@@ -107,7 +116,7 @@ const controller = {
       data = await validator.details.validateAsync(req.body);
     } catch (error) {
       return res.status(400).json({
-        error: 'Invalid input',
+        error: error.message,
       });
     }
 

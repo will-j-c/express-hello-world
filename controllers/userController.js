@@ -180,8 +180,9 @@ const controller = {
   },
 
   editProfile: async (req, res) => {
-    const { name, tagline, interests, linkedin, github, twitter, facebook } = req.body;
+    const { name, tagline, linkedin, github, twitter, facebook, about } = req.body;
     const file = req.file;
+
     if (file) {
       try {
         const result = await imageKit.upload({
@@ -205,10 +206,16 @@ const controller = {
       twitter,
     };
     //remove the empty attribute from socmedFormat
-    const socmed = Object.fromEntries(Object.entries(socmedFormat).filter(([_, v]) => v != ''));
-
+    const socmed = Object.fromEntries(Object.entries(socmedFormat).filter(([_, v]) => !!v));
     //handle skills:
-    const validatedSkills = req.body.skills?.filter((skill) => validSkills.includes(skill));
+    const skillsArr = JSON.parse(req.body.skills);
+
+    let validatedSkills = [];
+    if (skillsArr.length) {
+      validatedSkills = skillsArr?.filter((skill) => validSkills.includes(skill));
+    }
+    const interests = JSON.parse(req.body.interests);
+
     const skills = validatedSkills;
     try {
       await validator.profile.validateAsync({
@@ -228,7 +235,7 @@ const controller = {
     try {
       await UserModel.findOneAndUpdate(
         { username: req.params.username },
-        { name, tagline, skills, interests, socmed, profile_pic_url }
+        { name, tagline, skills, interests, socmed, profile_pic_url, about }
       );
       return res.status(201).json();
     } catch (error) {
@@ -378,6 +385,29 @@ const controller = {
     } catch (error) {
       return res.status(401).json({
         error: 'Failed to activate user account',
+      });
+    }
+  },
+
+  showApplications: async (req, res) => {
+    try {
+      const user = await UserModel.findOne({ username: req.params.username });
+      const user_id = user._id;
+      const applications = await ContributorRelationshipModel.find(
+        { user_id },
+        { __v: 0, user_id: 0, _id: 0 }
+      ).populate({
+        path: 'contributor_id',
+        select: '-__v',
+        populate: {
+          path: 'project_id',
+          select: '-_id slug title',
+        },
+      });
+      return res.json(applications);
+    } catch (error) {
+      return res.status(500).json({
+        error: 'Failed to fetch data',
       });
     }
   },

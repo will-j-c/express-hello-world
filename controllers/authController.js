@@ -73,14 +73,12 @@ const controller = {
       to: email,
       from: 'helloworld.sg.ga@gmail.com',
       subject: 'Please Verify Your Email',
-      // TO DO: change the verification url to client side url instead
       html: `
         <h1>Welcome to HelloWorld!</h1>
         <hr/>
-        <h2>Let's verify your email</h2>
-        <p>https://hello-world-zmw.netlify.app/api/v1/users/${activateToken}/activate</p>
-        <a href="https://hello-world-zmw.netlify.app/api/v1/users/${activateToken}/activate"
-          <button>Verify</button>
+        <h2>Click the link below to verify your email and get started</h2>
+        <a href="${process.env.CLIENT_URL}/users/activate/${activateToken}" style="color:#33BB9A; font-weight: 600;">
+          <h3>Verify my email<h3>
         </a>
       `,
     };
