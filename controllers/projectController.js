@@ -92,7 +92,7 @@ const controller = {
   },
 
   uploadPhotos: async (req, res) => {
-    if (req.files.logo_url) {
+    if (req.files?.logo_url) {
       try {
         req.body.logo_url = await getLogoUrl(req.files.logo_url, req.query.slug);
       } catch (error) {
@@ -101,7 +101,7 @@ const controller = {
         });
       }
     }
-    if (req.files.image_urls) {
+    if (req.files?.image_urls) {
       try {
         req.body.image_urls = await getProjectImageUrls(req.files.image_urls, req.query.slug);
       } catch (error) {
