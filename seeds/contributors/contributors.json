@@ -2,11 +2,7 @@
   {
     "title": "Frontend Developer",
     "project_id": "to be updated",
-    "skills": [
-      "React",
-      "Frontend Development",
-      "JavaScript"
-    ],
+    "skills": ["React", "Frontend Development", "JavaScript"],
     "is_remote": true,
     "description": "Making the website look fabulous",
     "commitment_level": "Medium",
@@ -16,10 +12,7 @@
   {
     "title": "Full Stack Developer",
     "project_id": "to be updated",
-    "skills": [
-      "Full Stack",
-      "MERN"
-    ],
+    "skills": ["Full Stack", "MERN"],
     "is_remote": true,
     "description": "Make magic happen - build everything by yourself from scratch",
     "commitment_level": "High",
@@ -28,10 +21,7 @@
   {
     "title": "Finance Wizard",
     "project_id": "to be updated",
-    "skills": [
-      "Financial Planning",
-      "Project Management"
-    ],
+    "skills": ["Financial Planning", "Project Management"],
     "is_remote": false,
     "city": "Singapore, Singapore",
     "description": "Make the money move",
@@ -41,14 +31,7 @@
   {
     "title": "Software Engineers",
     "project_id": "to be updated",
-    "skills": [
-      "JavaScript",
-      "Full Stack",
-      "MERN",
-      "React Native",
-      "HTML/CSS",
-      "Python"
-    ],
+    "skills": ["JavaScript", "Full Stack", "MERN", "React Native", "HTML/CSS", "Python"],
     "is_remote": true,
     "city": "Ho Chi Minh, Vietnam",
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
@@ -59,14 +42,91 @@
   {
     "title": "UX/UI Designer",
     "project_id": "to be updated",
-    "skills": [
-      "HTML/CSS",
-      "UI/UX Design",
-      "React"
-    ],
+    "skills": ["HTML/CSS", "UI/UX Design", "React"],
     "is_remote": true,
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     "commitment_level": "High",
     "available_slots": 2
+  },
+  {
+    "title": "Full Stack Engineer (Nodejs + Reactjs)",
+    "project_id": "to be updated",
+    "skills": ["HTML/CSS", "MERN", "React", "JavaScript", "Full Stack", "Cloud Storage"],
+    "is_remote": false,
+    "description": "Design, develop, and implement applications. Accurately translate user and business needs into functional codes.Write high quality, maintainable code, build reusable code and libraries for future use ",
+    "commitment_level": "High",
+    "available_slots": 2
+  },
+  {
+    "title": "Back End Developer",
+    "project_id": "to be updated",
+    "skills": ["Data analysis", "Business Analysis", "Java", "C++", "Web services", "AWS"],
+    "is_remote": false,
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+    "commitment_level": "High",
+    "available_slots": 4
+  },
+  {
+    "title": ".NET Developer",
+    "project_id": "to be updated",
+    "skills": ["Financial Planning", "Product Management", "Data Analytics"],
+    "is_remote": false,
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+    "commitment_level": "High",
+    "available_slots": 4
+  },
+  {
+    "title": "ReactJS Developer, Digital & Emerging Tech, Technology Consulting",
+    "project_id": "to be updated",
+    "skills": ["JavaScript", "Full Stack", "Frontend Development", "Angular", "HTML/CSS", "React"],
+    "is_remote": false,
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+    "commitment_level": "High",
+    "available_slots": 1
+  },
+  {
+    "title": "React Native Mobile App Developer",
+    "project_id": "to be updated",
+    "skills": ["MERN", "HTML/CSS", "React"],
+    "is_remote": false,
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+    "commitment_level": "Low",
+    "available_slots": 3
+  },
+  {
+    "title": "Frontend Developer",
+    "project_id": "to be updated",
+    "skills": ["MERN", "HTML/CSS", "React", "Content Writing", "Frontend Development"],
+    "is_remote": false,
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+    "commitment_level": "Low",
+    "available_slots": 3
+  },
+  {
+    "title": "Game Developer",
+    "project_id": "to be updated",
+    "skills": ["Business Analysis", "Java", "C++", "Web3", "API"],
+    "is_remote": false,
+    "description": "We are looking for a talented game developer to help build the next generation of games for our company. In this role you will be responsible for coding the initial base engine of the game, fixing bugs, and troubleshooting design issues. You may also be required to help develop storylines, characters, levels, puzzles, and contribute to the overall game concept.",
+    "commitment_level": "Low",
+    "available_slots": 3
+  },
+  {
+    "title": "User Researcher - Global Payment",
+    "project_id": "to be updated",
+    "skills": ["Business Analysis", "UI/UX Design", "Digital Marketing", "Financial Planning"],
+    "is_remote": false,
+    "description": "Founded in 2012, ByteDance's mission is to inspire creativity and enrich life. With a suite of more than a dozen products, including TikTok, Helo, and Resso, as well as platforms specific to the China market, including Toutiao, Douyin, and Xigua, ByteDance has made it easier and more fun for people to connect with, consume, and create content.",
+    "commitment_level": "Low",
+    "available_slots": 1
+  },
+  {
+    "title": "Product Designer",
+    "project_id": "to be updated",
+    "skills": ["Business Analysis", "UI/UX Design"],
+    "is_remote": false,
+    "description": "Experience with integrating qualitative and quantitative data to inform your design decisions.",
+    "commitment_level": "Low",
+    "available_slots": 1
   }
 ]
