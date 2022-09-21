@@ -212,7 +212,7 @@ const controller = {
 
     let validatedSkills = [];
     if (skillsArr.length) {
-      validatedSkills = skillsStr?.filter((skill) => validSkills.includes(skill));
+      validatedSkills = skillsArr?.filter((skill) => validSkills.includes(skill));
     }
     const interests = JSON.parse(req.body.interests);
 
