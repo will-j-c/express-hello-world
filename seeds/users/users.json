@@ -52,5 +52,25 @@
     "email": "llama@test.com",
     "hash": "llama123",
     "tagline": "bahhhhhhh"
+  },
+  {
+    "name": "Will Colgate",
+    "username": "will",
+    "skills": ["React Native", "HTML/CSS", "MERN", "Full Stack"],
+    "interests": ["Cooking", "Movie", "Shaker Fries"],
+    "email": "will@test.com",
+    "hash": "will123",
+    "tagline": "Design with prototypes, Mock with code, Deliver working products",
+    "about": "I wanna travel around the world, with a huge McSpicy!!!!"
+  },
+  {
+    "name": "Melody Le",
+    "username": "melody",
+    "skills": ["UI/UX Design", "HTML/CSS", "MERN", "Full Stack", "Backend Development"],
+    "interests": ["Cooking", "movie", "Travel"],
+    "email": "melody@test.com",
+    "hash": "melody123",
+    "tagline": "Hello World.",
+    "about": "McSpicy is my passion. I'm lovin' it!!!!!"
   }
 ]
