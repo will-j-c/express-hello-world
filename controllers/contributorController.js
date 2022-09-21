@@ -7,6 +7,7 @@ const UserModel = require('../models/userModel');
 
 const validator = require('../validations/contributorValidation');
 const validSkills = require('../seeds/predefined-data/skills.json');
+const ContributorRelationshipModel = require('../models/contributorsRelationship');
 
 const getData = async (username, contributorID) => {
   try {
@@ -50,6 +51,7 @@ const controller = {
             select: '-_id user_id title slug logo_url',
             populate: { path: 'user_id', select: '-_id username' },
           })
+          .lean()
       } else {
         contributors = await ContributorModel
           .find({}, { __v: 0 })
@@ -58,14 +60,29 @@ const controller = {
             select: '-_id user_id title slug logo_url',
             populate: { path: 'user_id', select: '-_id username' },
           })
+          .lean()
       }
 
       if (limit) {
         contributors = contributors.slice(0, limit);
       }
+
+      for await (const contributor of contributors) {
+        contributor['applicants'] = await RelationshipModel
+          .find(
+            { contributor_id: contributor._id },
+            { _id: 0, contributor_id: 0, __v: 0}
+          )
+          .populate({
+            path: 'user_id',
+            select: '-_id username'
+          })
+      }
+
       return res.json(contributors);
 
     } catch (error) {
+      console.log(error);
       return res.status(500).json({
         error: 'Failed to fetch data',
       });
