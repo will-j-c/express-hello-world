@@ -286,7 +286,6 @@ const controller = {
             jobs[i].contributors[j] = { user, state: jobs[i].contributors[j].state };
           }
         }
-        delete jobs[i]._id;
       }
       // Clean up data that does not need to be sent
       delete project._id;
