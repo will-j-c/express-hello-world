@@ -196,21 +196,14 @@ const controller = {
     }
     if (req.files?.image_urls) {
       try {
-        // const deletedProjectImages = req.body?.deletedImages;
         const newProjectImages = await getProjectImageUrls(req.files.image_urls, req.params.slug);
         const oldProjectData = await ProjectModel.findOne(
           { slug: req.params.slug },
           { image_urls: 1, _id: 0 }
         );
         const oldImages = oldProjectData?.image_urls;
-        //if user don't delete any image:
         let oldImagesAfterDelete = oldImages;
-        //if user delete some images:
-        // if (deletedProjectImages) {
-        //   oldImagesAfterDelete = diffArray(oldImages, deletedProjectImages);
-        // }
         req.body.image_urls = [...oldImagesAfterDelete, ...newProjectImages];
-        // delete req.body.deletedImages;
         await ProjectModel.findOneAndUpdate(
           { slug: req.params.slug },
           { image_urls: req.body.image_urls }
@@ -227,9 +220,16 @@ const controller = {
 
   editProject: async (req, res) => {
     // Validations
+    const deletedImages = req.body.deleted_images;
+    const oldImages = await ProjectModel.findOne({ slug: req.params.slug }, {_id: 0, image_urls: 1}).lean();
+    const newImageArr = oldImages.image_urls.filter(image => {
+      return !deletedImages.includes(image)
+    });
+    req.body.image_urls = newImageArr;
     let validatedResults = null;
     delete req.body.step;
     delete req.body.username;
+    delete req.body?.deleted_images;
     delete req.body?.logo_url_files;
     delete req.body?.image_urls_files;
     try {
