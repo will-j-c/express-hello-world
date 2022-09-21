@@ -54,9 +54,12 @@ const diffArray = (oldData, deletedData) => {
 const controller = {
   showAllProjects: async (req, res) => {
     const categoriesFilter = req.query?.categories?.replaceAll('-', ' ').split(',');
+    const keywordsFilter = req.query?.q;
+    const limit = req.query?.limit;
+
     try {
       let projects = null;
-      if (!categoriesFilter) {
+      if (!categoriesFilter && !keywordsFilter) {
         projects = await ProjectModel.find(
           {
             state: 'published',
@@ -68,7 +71,26 @@ const controller = {
             path: 'user_id',
             select: '-_id username',
           });
-      } else {
+
+      } else if (keywordsFilter) {
+        projects = await ProjectModel.find(
+          { $and: [
+            { state: 'published' },
+            { $or: [
+              { title: { "$regex": keywordsFilter, "$options": "i" } },
+              { tagline: { "$regex": keywordsFilter, "$options": "i" } },
+              { categories: { $elemMatch : {"$regex": keywordsFilter, "$options": "i" }} }
+            ]}
+          ]},
+          { __v: 0, _id: 0, description: 0 }
+        )
+          .sort({ updatedAt: 'desc' })
+          .populate({
+            path: 'user_id',
+            select: '-_id username',
+          });
+
+      } else if (categoriesFilter) {
         projects = await ProjectModel.find(
           {
             state: 'published',
@@ -83,8 +105,12 @@ const controller = {
           });
       }
 
+      if (limit) {
+        projects = projects.slice(0, limit);
+      }
       return res.json(projects);
     } catch (error) {
+      console.log(error);
       return res.status(500).json({
         error: 'Failed to fetch projects from database',
       });
@@ -92,7 +118,7 @@ const controller = {
   },
 
   uploadPhotos: async (req, res) => {
-    if (req.files.logo_url) {
+    if (req.files?.logo_url) {
       try {
         req.body.logo_url = await getLogoUrl(req.files.logo_url, req.query.slug);
       } catch (error) {
@@ -101,7 +127,7 @@ const controller = {
         });
       }
     }
-    if (req.files.image_urls) {
+    if (req.files?.image_urls) {
       try {
         req.body.image_urls = await getProjectImageUrls(req.files.image_urls, req.query.slug);
       } catch (error) {
@@ -170,21 +196,14 @@ const controller = {
     }
     if (req.files?.image_urls) {
       try {
-        // const deletedProjectImages = req.body?.deletedImages;
         const newProjectImages = await getProjectImageUrls(req.files.image_urls, req.params.slug);
         const oldProjectData = await ProjectModel.findOne(
           { slug: req.params.slug },
           { image_urls: 1, _id: 0 }
         );
         const oldImages = oldProjectData?.image_urls;
-        //if user don't delete any image:
         let oldImagesAfterDelete = oldImages;
-        //if user delete some images:
-        // if (deletedProjectImages) {
-        //   oldImagesAfterDelete = diffArray(oldImages, deletedProjectImages);
-        // }
         req.body.image_urls = [...oldImagesAfterDelete, ...newProjectImages];
-        // delete req.body.deletedImages;
         await ProjectModel.findOneAndUpdate(
           { slug: req.params.slug },
           { image_urls: req.body.image_urls }
@@ -201,9 +220,16 @@ const controller = {
 
   editProject: async (req, res) => {
     // Validations
+    const deletedImages = req.body.deleted_images;
+    const oldImages = await ProjectModel.findOne({ slug: req.params.slug }, {_id: 0, image_urls: 1}).lean();
+    const newImageArr = oldImages.image_urls.filter(image => {
+      return !deletedImages.includes(image)
+    });
+    req.body.image_urls = newImageArr;
     let validatedResults = null;
     delete req.body.step;
     delete req.body.username;
+    delete req.body?.deleted_images;
     delete req.body?.logo_url_files;
     delete req.body?.image_urls_files;
     try {
@@ -286,7 +312,6 @@ const controller = {
             jobs[i].contributors[j] = { user, state: jobs[i].contributors[j].state };
           }
         }
-        delete jobs[i]._id;
       }
       // Clean up data that does not need to be sent
       delete project._id;
