@@ -118,7 +118,7 @@ const controller = {
       commentCount = commentCount.length;
       const comments = await CommentModel.find(
         { project_id: projectId },
-        { project_id: 0, _id: 0, createdAt: 0 }
+        { project_id: 0, createdAt: 0 }
       )
         .sort({ updatedAt: 'desc' })
         .skip(skipNumber)
@@ -131,6 +131,7 @@ const controller = {
         updatedAt: comment.updatedAt,
         user_id: comment.user_id._id,
         username: comment.user_id.username,
+        _id: comment._id,
       }));
       return res.json({ commentCount, commentsToSend });
     } catch (error) {
