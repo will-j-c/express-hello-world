@@ -34,22 +34,35 @@ const getData = async (username, contributorID) => {
 const controller = {
   index: async (req, res) => {
     try {
-      // not sure but may need to apply filters based on req.query in future
-      const filters = {};
-      // note: unsure the implementation on FE
-      // hence currently returning all data (in case need for filtering, etc)
-      // can add $projects later on once FE implemnentation is confirmed
-      const contributors = await ContributorModel
-        .find({ filters }, { __v: 0 })
-        .populate({
-          path: 'project_id', 
-          select: '-_id user_id title slug logo_url',
-          populate: { path: 'user_id', select: '-_id username' },
-        })
-      ;
+      const keywordsFilter = req.query?.q;
+      const limit = req.query?.limit;
+      let contributors = null;
 
-      // for consideration later: do we also want to pull contributorRelationships
+      if (keywordsFilter) {
+        contributors = await ContributorModel
+          .find({
+            $or: [
+              { title: { "$regex": keywordsFilter, "$options": "i" } },
+              { skills: { $elemMatch : {"$regex": keywordsFilter, "$options": "i" }} }
+          ]}, { __v: 0 })
+          .populate({
+            path: 'project_id', 
+            select: '-_id user_id title slug logo_url',
+            populate: { path: 'user_id', select: '-_id username' },
+          })
+      } else {
+        contributors = await ContributorModel
+          .find({}, { __v: 0 })
+          .populate({
+            path: 'project_id', 
+            select: '-_id user_id title slug logo_url',
+            populate: { path: 'user_id', select: '-_id username' },
+          })
+      }
 
+      if (limit) {
+        contributors = contributors.slice(0, limit);
+      }
       return res.json(contributors);
 
     } catch (error) {
