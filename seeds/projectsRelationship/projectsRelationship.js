@@ -19,18 +19,6 @@ const createProjectsRelationships = async (relations) => {
   relations[3].project_id = projects[4]._id;
   relations[4].user_id = users[1]._id;
   relations[4].project_id = projects[3]._id;
-  relations[5].user_id = users[1]._id;
-  relations[5].project_id = projects[3]._id;
-  relations[6].user_id = users[5]._id;
-  relations[6].project_id = projects[9]._id;
-  relations[7].user_id = users[4]._id;
-  relations[7].project_id = projects[12]._id;
-  relations[8].user_id = users[6]._id;
-  relations[8].project_id = projects[8]._id;
-  relations[9].user_id = users[5]._id;
-  relations[9].project_id = projects[10]._id;
-  relations[10].user_id = users[4]._id;
-  relations[10].project_id = projects[6]._id;
 
   for await (const relation of relations) {
     try {
