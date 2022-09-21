@@ -180,8 +180,9 @@ const controller = {
   },
 
   editProfile: async (req, res) => {
-    const { name, tagline, interests, linkedin, github, twitter, facebook, about } = req.body;
+    const { name, tagline, linkedin, github, twitter, facebook, about } = req.body;
     const file = req.file;
+
     if (file) {
       try {
         const result = await imageKit.upload({
@@ -207,7 +208,14 @@ const controller = {
     //remove the empty attribute from socmedFormat
     const socmed = Object.fromEntries(Object.entries(socmedFormat).filter(([_, v]) => !!v));
     //handle skills:
-    const validatedSkills = req.body.skills?.filter((skill) => validSkills.includes(skill));
+    const skillsArr = JSON.parse(req.body.skills);
+
+    let validatedSkills = [];
+    if (skillsArr.length) {
+      validatedSkills = skillsStr?.filter((skill) => validSkills.includes(skill));
+    }
+    const interests = JSON.parse(req.body.interests);
+
     const skills = validatedSkills;
     try {
       await validator.profile.validateAsync({
