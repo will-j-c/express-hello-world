@@ -54,9 +54,10 @@ const diffArray = (oldData, deletedData) => {
 const controller = {
   showAllProjects: async (req, res) => {
     const categoriesFilter = req.query?.categories?.replaceAll('-', ' ').split(',');
+    const keywordsFilter = req.query?.q;
     try {
       let projects = null;
-      if (!categoriesFilter) {
+      if (!categoriesFilter && !keywordsFilter) {
         projects = await ProjectModel.find(
           {
             state: 'published',
@@ -68,7 +69,26 @@ const controller = {
             path: 'user_id',
             select: '-_id username',
           });
-      } else {
+
+      } else if (keywordsFilter) {
+        projects = await ProjectModel.find(
+          { $and: [
+            { state: 'published' },
+            { $or: [
+              { title: { "$regex": keywordsFilter, "$options": "i" } },
+              { tagline: { "$regex": keywordsFilter, "$options": "i" } },
+              { categories: { $elemMatch : {"$regex": keywordsFilter, "$options": "i" }} }
+            ]}
+          ]},
+          { __v: 0, _id: 0, description: 0 }
+        )
+          .sort({ updatedAt: 'desc' })
+          .populate({
+            path: 'user_id',
+            select: '-_id username',
+          });
+
+      } else if (categoriesFilter) {
         projects = await ProjectModel.find(
           {
             state: 'published',
@@ -85,6 +105,7 @@ const controller = {
 
       return res.json(projects);
     } catch (error) {
+      console.log(error);
       return res.status(500).json({
         error: 'Failed to fetch projects from database',
       });
