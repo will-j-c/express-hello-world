@@ -55,6 +55,8 @@ const controller = {
   showAllProjects: async (req, res) => {
     const categoriesFilter = req.query?.categories?.replaceAll('-', ' ').split(',');
     const keywordsFilter = req.query?.q;
+    const limit = req.query?.limit;
+
     try {
       let projects = null;
       if (!categoriesFilter && !keywordsFilter) {
@@ -103,6 +105,9 @@ const controller = {
           });
       }
 
+      if (limit) {
+        projects = projects.slice(0, limit);
+      }
       return res.json(projects);
     } catch (error) {
       console.log(error);
