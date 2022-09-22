@@ -311,7 +311,6 @@ const controller = {
       });
     }
   },
-
   followUser: async (req, res) => {
     try {
       const followee = await UserModel.findOne(

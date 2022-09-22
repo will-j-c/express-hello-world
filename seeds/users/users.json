@@ -19,9 +19,10 @@
     "about": "Random villager noises... Creeper goes BOOOOM",
     "tagline": "Experienced FullStack Dev",
     "socmed": {
-      "github": "https://github.com/ZoeNguyen73",
+      "github": "https://github.com/",
       "faceboook": "https://www.facebook.com/"
-    }
+    },
+    "profile_pic_url": "https://sm.ign.com/ign_ap/review/s/super-smas/super-smash-bros-ultimate-dlc-review-minecraft-steve_twjf.jpg"
   },
 
   {
@@ -37,20 +38,113 @@
   },
 
   {
-    "name": "Zoe ZZZ",
+    "name": "Zoe Nguyen",
     "username": "zoe",
     "tagline": "Aspiring Software Engineer",
+    "skills": ["React Native", "HTML/CSS", "MERN", "Full Stack"],
     "email": "zoe@test.com",
-    "hash": "zoe123"
+    "hash": "zoe123",
+    "socmed": {
+      "github": "https://github.com/ZoeNguyen73",
+      "linkedin": "https://www.linkedin.com/in/zoe-nguyen-ndnn/"
+    }
   },
 
   {
-    "name": "Fluffy Llama",
-    "username": "llama",
-    "skills": ["Digital Marketing"],
-    "interests": ["Grass and things like grass"],
-    "email": "llama@test.com",
-    "hash": "llama123",
-    "tagline": "bahhhhhhh"
-  }
+    "name": "Will Colgate",
+    "username": "will",
+    "skills": ["React Native", "HTML/CSS", "MERN", "Full Stack"],
+    "interests": ["DnD", "Games", "Shaker Fries"],
+    "email": "will@test.com",
+    "hash": "will123",
+    "tagline": "GA student expanding my knowledge of the development world.",
+    "about": "I wanna travel around the world, with a huge McSpicy!!!!",
+    "profile_pic_url": "https://image.shutterstock.com/mosaic_250/2805913/1491969899/stock-photo-portrait-of-young-smiling-caucasian-man-with-crossed-arms-wearing-smart-watch-and-casual-denim-1491969899.jpg"
+  },
+
+  {
+    "name": "Melody Le",
+    "username": "melody",
+    "skills": ["UI/UX Design", "HTML/CSS", "MERN", "Full Stack", "Backend Development"],
+    "interests": ["Cooking", "movie", "Travel"],
+    "email": "melody@test.com",
+    "hash": "melody123",
+    "tagline": "Hello World.",
+    "about": "McSpicy is my passion. I'm lovin' it!!!!!",
+    "profile_pic_url": "https://t4.ftcdn.net/jpg/03/83/25/83/360_F_383258331_D8imaEMl8Q3lf7EKU2Pi78Cn0R7KkW9o.jpg"
+  },
+
+  {
+    "name": "Fake Zoe",
+    "username": "fakezoe",
+    "interests": ["Education", "Environmental causes"],
+    "email": "fakezoe@test.com",
+    "hash": "fakezoe123",
+    "tagline": "In another timeline, I am the real one",
+    "profile_pic_url": "https://image.shutterstock.com/image-photo/portrait-beautiful-smiling-young-girl-260nw-1934312486.jpg"
+  },
+  {
+    "name":"Germayne Tute",
+    "email":"gtute0@nifty.com",
+    "hash":"z2kvX2Jh256",
+    "tagline":"Innovative bifurcated instruction set",
+    "interests":["Subversion","Sports Play-by-play","DVI","TLM"],
+    "username":"gtute0",
+    "skills":["Vue",
+    "Golang",
+    "Python",
+    "SQL"]
+  },
+  {
+    "name":"Phaedra Darnborough",
+    "email":"pdarnborough1@uiuc.edu",
+    "hash":"rY8Oe0Hb1jkV",
+    "tagline":"Customizable directional protocol",
+    "interests":["AU","BLS","SAP SRM","Eastern Europe"],
+    "username":"pdarnborough1",
+    "skills":["Algorithm","Postman","Abstract Thinking","AWS"]
+  },
+  {
+    "name":"Otha Edmands",
+    "email":"oedmands2@spotify.com",
+    "hash":"LZpMIA3CkCG",
+    "tagline":"Digitized mission-critical focus group",
+    "interests":["Hardware Architecture","Sales Effectiveness","Fertility","Quality Management"],
+    "username":"oedmands2",
+    "skills":["Digital Marketing",
+    "Financial Planning"]
+  },
+  {
+    "name":"Faythe Scrane",
+    "email":"fscrane3@msn.com",
+    "hash":"FMJTUZYH9Ic5",
+    "tagline":"Expanded zero administration challenge",
+    "interests":["Civil Litigation","Energy","ODI","IVA"],
+    "username":"fscrane3"
+  },
+  {
+    "name":"Cristabel Baudinot",
+    "email":"cbaudinot4@1und1.de",
+    "hash":"kWwQtEfGPPk",
+    "tagline":"Face to face hybrid paradigm",
+    "interests":["Sony Vegas","VMware vSphere", "Key Account Development","Sales Management"],
+    "username":"cbaudinot4",
+    "skills":["Public Relations",
+    "Content Writing"]
+  },
+  {
+    "name":"Wilmer Agiolfinger",
+    "email":"wagiolfinger5@amazon.co.jp",
+    "hash":"6bgo0t",
+    "tagline":"Front-line systemic policy",
+    "interests":["Lyris","Virtual DJ","Xcalibur","Occupational Therapists"],
+    "username":"wagiolfinger5",
+    "skills":["Full Stack",
+    "Frontend Development",
+    "Backend Development"]
+  },
+  {"name":"Hernando Garnam","email":"hgarnam6@boston.com","hash":"JNqfcoe","tagline":"Stand-alone grid-enabled data-warehouse","interests":["Post Production","Drip Irrigation","Mobile TV","Risk Assessment"],"username":"hgarnam6"},
+  {"name":"Alice Duffell","email":"aduffell7@altervista.org","hash":"vKjUCQAlP2","tagline":"Polarised directional middleware","interests":["Abaqus","TMW","Public Health","RC Detailing"],"username":"aduffell7"},
+  {"name":"Norris Khadir","email":"nkhadir8@blogspot.com","hash":"azqb3pijqX","tagline":"Profit-focused multimedia strategy","interests":["ADP Payroll","AHDL","Java RMI","CCIE"],"username":"nkhadir8"},
+  {"name":"Hazel Andrusov","email":"handrusov9@skyrock.com","hash":"nsFqcsXbI","tagline":"Enhanced fault-tolerant open architecture","interests":["Mental Health","Canon XL2","Rational DOORS","Youth Ministry"],"username":"handrusov9"}
 ]
