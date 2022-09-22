@@ -157,6 +157,7 @@ const controller = {
     delete req.body?.logo_url;
     delete req.body?.image_urls_files;
     delete req.body?.logo_url_files;
+    delete req.body?.deleted_images;
     // Validations
     let validatedResults = null;
     if (req.headers['content-type'] === 'application/json') {
