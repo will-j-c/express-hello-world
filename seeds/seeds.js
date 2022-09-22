@@ -27,7 +27,7 @@ const seed = async () => {
   const usersSeeding = await userSeed(UsersJson);
   const projectsSeeding = await projectsSeed(ProjectsJson);
   const contributorsSeeding = await contributorsSeed(contributorsJson);
-  // const usersRelationshipsSeeding = await usersRelationshipsSeed(UsersRelations);
+  const usersRelationshipsSeeding = await usersRelationshipsSeed(UsersRelations);
   // const projectsRelationshipsSeeding = await projectsRelationshipsSeed(ProjectsRelations);
   // const contributorsRelationshipsSeeding = await contributorsRelationshipsSeed(
   //   contributorsRelations
