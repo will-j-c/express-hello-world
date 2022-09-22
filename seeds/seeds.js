@@ -26,28 +26,29 @@ const contributorsRelations = require('./contributorsRelationship/contributorsRe
 const seed = async () => {
   const usersSeeding = await userSeed(UsersJson);
   const projectsSeeding = await projectsSeed(ProjectsJson);
-  const contributorsSeeding = await contributorsSeed(contributorsJson);
-  const usersRelationshipsSeeding = await usersRelationshipsSeed(UsersRelations);
-  const projectsRelationshipsSeeding = await projectsRelationshipsSeed(ProjectsRelations);
-  const contributorsRelationshipsSeeding = await contributorsRelationshipsSeed(
-    contributorsRelations
-  );
+  // const contributorsSeeding = await contributorsSeed(contributorsJson);
+  // const usersRelationshipsSeeding = await usersRelationshipsSeed(UsersRelations);
+  // const projectsRelationshipsSeeding = await projectsRelationshipsSeed(ProjectsRelations);
+  // const contributorsRelationshipsSeeding = await contributorsRelationshipsSeed(
+  //   contributorsRelations
+  // );
+
   // Seed some random comments
-  const numOfComments = 50;
-  const commentData = [];
-  const userIds = await UserModel.find({}, { _id: 1 }).lean();
-  const projectIds = await ProjectModel.find({}, { _id: 1 }).lean();
-  for (let i = 0; i < numOfComments; i += 1) {
-    const randomUser = userIds[Math.floor(Math.random() * userIds.length)];
-    const randomProject = projectIds[Math.floor(Math.random() * projectIds.length)];
-    const newComment = {
-      user_id: randomUser._id,
-      project_id: randomProject._id,
-      content: `Comment ${i + 1}: I like dungeons and dragons and McSpicy`,
-    };
-    commentData.push(newComment);
-  }
-  await CommentModel.create(commentData);
+  // const numOfComments = 50;
+  // const commentData = [];
+  // const userIds = await UserModel.find({}, { _id: 1 }).lean();
+  // const projectIds = await ProjectModel.find({}, { _id: 1 }).lean();
+  // for (let i = 0; i < numOfComments; i += 1) {
+  //   const randomUser = userIds[Math.floor(Math.random() * userIds.length)];
+  //   const randomProject = projectIds[Math.floor(Math.random() * projectIds.length)];
+  //   const newComment = {
+  //     user_id: randomUser._id,
+  //     project_id: randomProject._id,
+  //     content: `Comment ${i + 1}: I like dungeons and dragons and McSpicy`,
+  //   };
+  //   commentData.push(newComment);
+  // }
+  // await CommentModel.create(commentData);
   process.exit(1);
 };
 
