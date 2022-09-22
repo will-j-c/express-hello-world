@@ -19,12 +19,35 @@ const imageKit = new ImageKit({
 
 const controller = {
   showAllUsers: async (req, res) => {
+    const keywordsFilter = req.query?.q;
+    const limit = req.query?.limit;
     try {
-      const users = await UserModel.aggregate([
-        { $match: {} },
-        { $sort: { updatedAt: -1 } },
-        { $project: { hash: 0 } },
-      ]);
+      let users = null;
+
+      if (keywordsFilter) {
+        users = await UserModel.aggregate([
+          { $match: {
+            $or: [
+              {username: { "$regex": keywordsFilter, "$options": "i" }},
+              {about: { "$regex": keywordsFilter, "$options": "i" }},
+              {tagline: { "$regex": keywordsFilter, "$options": "i" }},
+            ]
+          } },
+          { $sort: { updatedAt: -1 } },
+          { $project: { hash: 0 } },
+        ]);
+      } else {
+        users = await UserModel.aggregate([
+          { $match: {} },
+          { $sort: { updatedAt: -1 } },
+          { $project: { hash: 0 } },
+        ]);
+      }
+
+      if (limit) {
+        users = users.slice(0, limit);
+      }
+      
       return res.json(users);
     } catch (error) {
       return res.status(500).json({
@@ -288,7 +311,6 @@ const controller = {
       });
     }
   },
-
   followUser: async (req, res) => {
     try {
       const followee = await UserModel.findOne(

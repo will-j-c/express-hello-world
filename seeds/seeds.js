@@ -32,6 +32,7 @@ const seed = async () => {
   const contributorsRelationshipsSeeding = await contributorsRelationshipsSeed(
     contributorsRelations
   );
+
   // Seed some random comments
   const numOfComments = 50;
   const commentData = [];
