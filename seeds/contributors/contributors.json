@@ -53,6 +53,7 @@
     "project_id": "to be updated",
     "skills": ["HTML/CSS", "MERN", "React", "JavaScript", "Full Stack", "Cloud Storage"],
     "is_remote": false,
+    "city": "Bali, Indonesia",
     "description": "Design, develop, and implement applications. Accurately translate user and business needs into functional codes.Write high quality, maintainable code, build reusable code and libraries for future use ",
     "commitment_level": "High",
     "available_slots": 2
@@ -61,7 +62,7 @@
     "title": "Back End Developer",
     "project_id": "to be updated",
     "skills": ["Data analysis", "Business Analysis", "Java", "C++", "Web services", "AWS"],
-    "is_remote": false,
+    "is_remote": true,
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
     "commitment_level": "High",
     "available_slots": 4
@@ -70,7 +71,7 @@
     "title": ".NET Developer",
     "project_id": "to be updated",
     "skills": ["Financial Planning", "Product Management", "Data Analytics"],
-    "is_remote": false,
+    "is_remote": true,
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
     "commitment_level": "High",
     "available_slots": 4
@@ -80,6 +81,7 @@
     "project_id": "to be updated",
     "skills": ["JavaScript", "Full Stack", "Frontend Development", "Angular", "HTML/CSS", "React"],
     "is_remote": false,
+    "city": "New York, USA",
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
     "commitment_level": "High",
     "available_slots": 1
@@ -88,7 +90,7 @@
     "title": "React Native Mobile App Developer",
     "project_id": "to be updated",
     "skills": ["MERN", "HTML/CSS", "React"],
-    "is_remote": false,
+    "is_remote": true,
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
     "commitment_level": "Low",
     "available_slots": 3
@@ -97,9 +99,10 @@
     "title": "Frontend Developer",
     "project_id": "to be updated",
     "skills": ["MERN", "HTML/CSS", "React", "Content Writing", "Frontend Development"],
-    "is_remote": false,
+    "is_remote": true,
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
-    "commitment_level": "Low",
+    "commitment_level": "Medium",
+    "remuneration": "USD2,000/month",
     "available_slots": 3
   },
   {
@@ -107,6 +110,7 @@
     "project_id": "to be updated",
     "skills": ["Business Analysis", "Java", "C++", "Web3", "API"],
     "is_remote": false,
+    "city": "Singapore, Singapore",
     "description": "We are looking for a talented game developer to help build the next generation of games for our company. In this role you will be responsible for coding the initial base engine of the game, fixing bugs, and troubleshooting design issues. You may also be required to help develop storylines, characters, levels, puzzles, and contribute to the overall game concept.",
     "commitment_level": "Low",
     "available_slots": 3
@@ -117,7 +121,7 @@
     "skills": ["Business Analysis", "UI/UX Design", "Digital Marketing", "Financial Planning"],
     "is_remote": false,
     "description": "Founded in 2012, ByteDance's mission is to inspire creativity and enrich life. With a suite of more than a dozen products, including TikTok, Helo, and Resso, as well as platforms specific to the China market, including Toutiao, Douyin, and Xigua, ByteDance has made it easier and more fun for people to connect with, consume, and create content.",
-    "commitment_level": "Low",
+    "commitment_level": "High",
     "available_slots": 1
   },
   {
@@ -126,7 +130,8 @@
     "skills": ["Business Analysis", "UI/UX Design"],
     "is_remote": false,
     "description": "Experience with integrating qualitative and quantitative data to inform your design decisions.",
-    "commitment_level": "Low",
+    "commitment_level": "Medium",
+    "remuneration": "USD3,500/month",
     "available_slots": 1
   }
 ]

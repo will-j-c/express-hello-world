@@ -27,7 +27,6 @@ const createProjects = async (projects) => {
     projects[i].user_id = randomUser._id;
   }
 
-
   for await (const project of projects) {
     try {
       await ProjectModel.create(project);

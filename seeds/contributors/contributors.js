@@ -16,6 +16,14 @@ const createcontributors = async (contributors) => {
   contributors[3].project_id = thirdProjectID;
   contributors[4].project_id = fourthProjectID;
 
+  const allProjects = await ProjectModel.find().exec();
+
+  // for the rest of the projects, assign random userID among the main users
+  for (let i = 5, j = contributors.length; i < j; i++) {
+    const randomProject = allProjects[Math.floor(Math.random() * allProjects.length)];
+    contributors[i].project_id = randomProject._id;
+  }
+
   for await (const contributor of contributors) {
     try {
       await contributorModel.create(contributor);
